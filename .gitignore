@@ -1,0 +1,28 @@
+# Build output (Makefile: BUILDDIR = build)
+build/
+.dep/
+
+# Old in-place / AVR Studio output
+default/
+
+# Generated files if built outside of build/
+*.o
+*.elf
+*.map
+*.lss
+*.sym
+*.eep
+*.cof
+*.lst
+*.d
+*.s.d
+.gdbinit
+gdbinit
+
+# Editor / OS
+*.swp
+*~
+.DS_Store
+
+# Atmel documentation PDFs (kept locally only)
+doc/*.pdf

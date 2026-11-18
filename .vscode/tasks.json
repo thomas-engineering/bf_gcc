@@ -1,0 +1,131 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}/main",
+        "env": {
+            "PATH": "${env:HOME}/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin:${env:PATH}"
+        }
+    },
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "avr-gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/main"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error|fatal error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "clean all",
+            "type": "shell",
+            "command": "make clean all",
+            "group": "build",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "flash (Butterfly bootloader)",
+            "type": "shell",
+            "command": "${env:HOME}/.arduino15/packages/arduino/tools/avrdude/8.0.0-arduino1/bin/avrdude",
+            "args": [
+                "-C",
+                "${env:HOME}/.arduino15/packages/arduino/tools/avrdude/8.0.0-arduino1/etc/avrdude.conf",
+                "-p",
+                "atmega169",
+                "-c",
+                "butterfly",
+                "-P",
+                "${input:serialPort}",
+                "-b",
+                "19200",
+                "-D",
+                "-U",
+                "flash:w:build/main.hex:i"
+            ],
+            "dependsOn": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "avarice (AVR Dragon, JTAG)",
+            "type": "shell",
+            "command": "avarice",
+            "args": [
+                "--dragon",
+                "--jtag",
+                "usb",
+                "--program",
+                "--file",
+                "build/main.elf",
+                ":4242"
+            ],
+            "isBackground": true,
+            "dependsOn": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^AVaRICE version",
+                    "endsPattern": "Waiting for connection on port 4242"
+                }
+            }
+        },
+        {
+            "label": "flash (STK500 ISP)",
+            "type": "shell",
+            "command": "${env:HOME}/.arduino15/packages/arduino/tools/avrdude/8.0.0-arduino1/bin/avrdude",
+            "args": [
+                "-C",
+                "${env:HOME}/.arduino15/packages/arduino/tools/avrdude/8.0.0-arduino1/etc/avrdude.conf",
+                "-c",
+                "stk500v2",
+                "-P",
+                "${input:stk500Port}",
+                "-p",
+                "atmega169",
+                "-B",
+                "125kHz",
+                "-U",
+                "flash:w:build/main.hex:i"
+            ],
+            "dependsOn": "build",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "serialPort",
+            "type": "promptString",
+            "description": "Serial port of the Butterfly",
+            "default": "/dev/ttyUSB0"
+        },
+        {
+            "id": "stk500Port",
+            "type": "promptString",
+            "description": "Serial port of the STK500",
+            "default": "/dev/ttyUSB0"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    // Put the Arduino IDE's avr-gcc on PATH for the integrated terminal and tasks
+    "terminal.integrated.env.linux": {
+        "PATH": "${env:HOME}/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin:${env:PATH}"
+    },
+    "terminal.integrated.env.windows": {
+        "PATH": "${env:LOCALAPPDATA}\\Arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino7\\bin;${env:PATH}"
+    },
+    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.default.configurationProvider": "",
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": { "*.h": "c", "Makefile": "makefile" },
+    "files.exclude": { "**/.dep": true, "**/*.o": true },
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": true,
+    "files.encoding": "utf8",
+    "files.autoGuessEncoding": true
+}
