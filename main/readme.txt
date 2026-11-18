@@ -20,6 +20,17 @@ Initially I marked my changes with "// mt" or enclosed them with "// mtA" and
 "// mtE" but forgot this for some changes esp. during debugging. 'diff' against 
 the original code to see everything that has been changed.
 
+19. Nov. 2026
+
+Uploading through the bootloader with avrdude: use "-e" together with "-D"
+(as in dude.cmd). The bootloader does not erase flash pages itself, it relies
+on the erase command sent by the programmer. With "-D" alone nothing is
+erased, old and new flash contents are ANDed together and the verify fails
+(a test with a changed text showed e.g. 0xC3 + 0xCC -> 0xC0).
+Example:
+avrdude -c butterfly -p atmega169 -P /dev/ttyUSB0 -b 19200 -e -D -U flash:w:build/main.hex:i
+The VS Code task "flash (Butterfly bootloader)" does this.
+
 18. Nov. 2026
 
 Tested with avr-gcc 7.3.0, avr-libc 2.0.0 (Arduino package)
