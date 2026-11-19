@@ -47,7 +47,7 @@ volatile char LCD_Data[LCD_REGISTER_COUNT];
 
 // Buffer that contains the text to be displayed
 // Note: Bit 7 indicates that this character is flashing
-volatile char gTextBuffer[TEXTBUFFER_SIZE];
+volatile char gTextBuffer[TEXTBUFFER_SIZE + 1];   // +1: terminator of a full-length text
 
 // Only six letters can be shown on the LCD.
 // With the gScroll and gScrollMode variables,

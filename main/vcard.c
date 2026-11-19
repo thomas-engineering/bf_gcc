@@ -44,7 +44,7 @@ char gUART = FALSE;
 // mt s/index/indexps
 //char index = 0;         //variable to keep the lenght of the present string
 uint8_t indexps = 0;
-char Name[STRLENGHT];
+char Name[STRLENGHT + 1];    // +1: room for the terminator of a full-length name
 
 // mt: jw method used 
 /// const char TEXT_WAIT[] PROGMEM                = "waiting for input on RS232";
@@ -78,6 +78,7 @@ char vCard(char input)
 		else
 		{
 			LoadEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  // Load name 
+			Name[indexps] = '\0';   // EEPROM holds no terminator
 			LCD_puts(Name, 1);
 			enter = 0;
 		}
