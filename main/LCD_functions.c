@@ -52,7 +52,7 @@ uint8_t CONTRAST = LCD_INITIAL_CONTRAST;
 *****************************************************************************/
 
 // mt void LCD_puts_f(char __flash *pFlashStr, char scrollmode)
-void LCD_puts_f(const char *pFlashStr, char scrollmode)
+void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode)
 {
     (void)scrollmode;   // not used in this port
     // char i;
@@ -97,7 +97,7 @@ void LCD_puts_f(const char *pFlashStr, char scrollmode)
 *	Purpose :		Writes a string to the LCD
 *
 *****************************************************************************/
-void LCD_puts(char *pStr, char scrollmode)
+void LCD_puts(char *pStr, uint8_t scrollmode)
 {
     (void)scrollmode;   // not used in this port
     uint8_t i; // char i;
@@ -180,7 +180,7 @@ void LCD_Clear(void)
 *	Purpose :		Enable/disable colons on the LCD
 *
 *****************************************************************************/
-void LCD_Colon(char show)
+void LCD_Colon(uint8_t show)
 {
     gColon = show;
 }
@@ -198,7 +198,7 @@ void LCD_Colon(char show)
 *	Purpose :		Tells the LCD that there is new data to be presented
 *
 *****************************************************************************/
-void LCD_UpdateRequired(char update, char scrollmode)
+void LCD_UpdateRequired(uint8_t update, uint8_t scrollmode)
 {
 
     while (gLCD_Update_Required);
@@ -239,10 +239,10 @@ void LCD_FlashReset(void)
 *	Purpose :		Adjust the LCD contrast
 *
 *****************************************************************************/
-char SetContrast(char input)
+uint8_t SetContrast(uint8_t input)
 {
-    static char enter = 1;
-    char CH, CL;
+    static uint8_t enter = 1;
+    uint8_t CH, CL;
 
     if (enter)
     {

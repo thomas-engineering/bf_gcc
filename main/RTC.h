@@ -36,12 +36,12 @@ extern volatile uint8_t  gPowerSaveTimer;
 //  Function declarations
 void RTC_init(void);            //initialize the Timer Counter 2 in asynchron operation
 void Time_update(void);        //updates the time and date
-char ShowClock(char input);
-char SetClock(char input);
-char SetClockFormat(char input);
-char ShowDate(char input);
-char SetDate(char input);
-char SetDateFormat(char input);
+uint8_t ShowClock(uint8_t input);
+uint8_t SetClock(uint8_t input);
+uint8_t SetClockFormat(uint8_t input);
+uint8_t ShowDate(uint8_t input);
+uint8_t SetDate(uint8_t input);
+uint8_t SetDateFormat(uint8_t input);
 
 #define CLOCK_24    1
 #define CLOCK_12    0

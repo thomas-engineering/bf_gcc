@@ -36,9 +36,9 @@
 *                   contain the tens and ones of the input.
 *
 *****************************************************************************/
-char CHAR2BCD2(char input)
+uint8_t CHAR2BCD2(uint8_t input)
 {
-    char high = 0;
+    uint8_t high = 0;
     
     
     while (input >= 10)                 // Count tens
@@ -64,7 +64,7 @@ char CHAR2BCD2(char input)
 *                   contain the ones, tens and hundreds of the input.
 *
 *****************************************************************************/
-uint16_t CHAR2BCD3(char input)
+uint16_t CHAR2BCD3(uint8_t input)
 {
     int high = 0;
         

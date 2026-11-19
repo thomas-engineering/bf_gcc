@@ -1,8 +1,8 @@
 #include <stdint.h>
 
-char RS232(char input);
-char vCard(char input);
-char EnterName(char input);
+uint8_t RS232(uint8_t input);
+uint8_t vCard(uint8_t input);
+uint8_t EnterName(uint8_t input);
 
 #define STRLENGHT    25
 
@@ -17,4 +17,4 @@ typedef struct
 #define EEPROM_VCARD ((VCARD_EEPROM *)0x100)
 
 // global variable to prevent entering power save, when using the UART
-extern char gUART;
+extern uint8_t gUART;

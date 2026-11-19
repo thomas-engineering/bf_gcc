@@ -39,7 +39,7 @@
 #include "vcard.h"
 
 
-char gUART = FALSE;
+uint8_t gUART = FALSE;
 
 // mt s/index/indexps
 //char index = 0;         //variable to keep the lenght of the present string
@@ -60,9 +60,9 @@ char Name[STRLENGHT + 1];    // +1: room for the terminator of a full-length nam
 *   Purpose :       Puts the name in EEPROM on the LCD
 *
 *****************************************************************************/
-char vCard(char input)
+uint8_t vCard(uint8_t input)
 {
-	static char enter = 1;
+	static uint8_t enter = 1;
 
 	if (enter)
 	{
@@ -114,9 +114,9 @@ char vCard(char input)
 *   mthomas: I have modified this function a little and did not keep the 
 *            original code.
 *****************************************************************************/
-char EnterName(char input)
+uint8_t EnterName(uint8_t input)
 {
-	static char enter = 1;
+	static uint8_t enter = 1;
 	uint8_t i, temp_index;
 	char c, c_out;
 
@@ -237,9 +237,9 @@ char EnterName(char input)
 *   Purpose :       Store data from the UART to EEPROM
 *
 *****************************************************************************/
-char RS232(char input)
+uint8_t RS232(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     char c;
     static char buffer[STRLENGHT];
     //static char temp_index;

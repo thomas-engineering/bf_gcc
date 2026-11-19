@@ -78,7 +78,7 @@ const __flash float LIGHT_VOLTAGE[] = // Vref table correspondent to the LIGHT_A
 
 
 float Vref = 2.900; // initial value
-char degree = CELSIUS; // char degree = CELCIUS;
+uint8_t degree = CELSIUS; // char degree = CELCIUS;
 
 
 /*****************************************************************************
@@ -92,7 +92,7 @@ char degree = CELSIUS; // char degree = CELCIUS;
 *   Purpose :       Initialize the ADC with the selected ADC-channel
 *
 *****************************************************************************/
-void ADC_init(char input)
+void ADC_init(uint8_t input)
 {
   
     ADMUX = input;    // external AREF and ADCx
@@ -116,7 +116,7 @@ void ADC_init(char input)
 *****************************************************************************/
 int ADC_read(void)
 {
-    char i;
+    uint8_t i;
     int ADC_temp;
     // mt int ADC = 0 ;
     int ADCr = 0;
@@ -216,15 +216,15 @@ void ADC_periphery(void)
     int ADCresult = 0;
     int ADCresult_temp = 0;
     int Temp_int;
-    char Temp;
+    uint8_t Temp;
     uint8_t i = 0;
     char TL;
     char TH;
     char VL;
 
     float V_ADC;
-    char VoltageHB;
-    char VoltageLB;
+    uint8_t VoltageHB;
+    uint8_t VoltageLB;
     
     ADCresult = ADC_read();         // Find the ADC value
      
@@ -415,9 +415,9 @@ void ADC_periphery(void)
 *   Purpose :       Enable or disable temperature measurements
 *
 *****************************************************************************/
-char TemperatureFunc(char input)
+uint8_t TemperatureFunc(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if (enter)
     {
@@ -471,9 +471,9 @@ char TemperatureFunc(char input)
 *   Purpose :       Enable or disable voltage measurements
 *
 *****************************************************************************/
-char VoltageFunc(char input)
+uint8_t VoltageFunc(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if (enter)
     {
@@ -513,9 +513,9 @@ char VoltageFunc(char input)
 *   Purpose :       Enable or disable light measurements
 *
 *****************************************************************************/
-char LightFunc(char input)
+uint8_t LightFunc(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if (enter)
     {

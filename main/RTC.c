@@ -53,10 +53,10 @@ uint8_t dateformat = 0;
 // mt this could be placed in progmem too, but the arrays are accessed quite
 //    often - so leaving them in RAM is better...
 
-char TBL_CLOCK_12[] =   // table used when displaying 12H clock  
+uint8_t TBL_CLOCK_12[] =   // table used when displaying 12H clock  
 {12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-char clockformat = CLOCK_24;    // set initial clock format to 24H
+uint8_t clockformat = CLOCK_24;    // set initial clock format to 24H
 
 // different date formates (text only)
 //__flash char EUROPEAN_DATE_TEXT[] =   "DDMMYY";
@@ -159,7 +159,7 @@ static void GetDate(uint16_t *year, uint8_t *month, uint8_t *day)
 *   Purpose :       Shows the clock on the LCD
 *
 *****************************************************************************/
-char ShowClock(char input)
+uint8_t ShowClock(uint8_t input)
 {
     //char HH, HL, MH, ML, SH, SL;
     uint8_t HH, HL, MH, ML, SH, SL;
@@ -219,9 +219,9 @@ char ShowClock(char input)
 *   Purpose :       Adjusts the clock
 *
 *****************************************************************************/
-char SetClock(char input)
+uint8_t SetClock(uint8_t input)
 {
-    static char enter_function = 1;
+    static uint8_t enter_function = 1;
     // static char time[3];    // table holding the temporary clock setting
     // static char mode = HOUR;
     // char HH, HL, MH, ML, SH, SL;
@@ -333,9 +333,9 @@ char SetClock(char input)
 *   Purpose :       Adjusts the Clockformat
 *
 *****************************************************************************/
-char SetClockFormat(char input)
+uint8_t SetClockFormat(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if(enter)
     {
@@ -395,9 +395,9 @@ char SetClockFormat(char input)
 *   Purpose :       Shows the date on the LCD
 *
 *****************************************************************************/
-char ShowDate(char input)
+uint8_t ShowDate(uint8_t input)
 {
-    char YH, YL, MH, ML, DH, DL;
+    uint8_t YH, YL, MH, ML, DH, DL;
     uint16_t year;
     uint8_t month, day;
 
@@ -462,9 +462,9 @@ char ShowDate(char input)
 *   Purpose :       Adjusts the date
 *
 *****************************************************************************/
-char SetDate(char input)
+uint8_t SetDate(uint8_t input)
 {
-	static char enter_function = 1;
+	static uint8_t enter_function = 1;
 	// static char date[3];    // table holding the temporary date setting
 	// static char mode = DAY;
 	// char YH, YL, MH, ML, DH, DL;
@@ -605,9 +605,9 @@ char SetDate(char input)
 *   Purpose :       Adjusts the Dateformat
 *
 *****************************************************************************/
-char SetDateFormat(char input)
+uint8_t SetDateFormat(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
 
     if(enter)
     {

@@ -39,14 +39,14 @@ volatile uint8_t gButtonTimeout = FALSE;
 
 //char KEY = NULL;
 //char KEY_VALID = FALSE;
-volatile char KEY = KEY_NULL;
-volatile char KEY_VALID = FALSE;
+volatile uint8_t KEY = KEY_NULL;
+volatile uint8_t KEY_VALID = FALSE;
 
 // Set by PinChangeInterrupt(), cleared by Button_ServiceClick(): the click takes
 // about 20 ms and must not be played with interrupts disabled.
 static volatile uint8_t ClickRequest = FALSE;
 
-char CountdownTimerHandle;
+uint8_t CountdownTimerHandle;
 
 /*****************************************************************************
 *
@@ -103,9 +103,9 @@ ISR_ALIAS(PCINT1_vect, PCINT0_vect);
 *****************************************************************************/
 void PinChangeInterrupt(void)
 {
-    char buttons;
+    uint8_t buttons;
 
-    char key;
+    uint8_t key;
 
 /*
     Read the buttons:
@@ -173,9 +173,9 @@ void PinChangeInterrupt(void)
 *   Purpose :       Get the valid key 
 *
 *****************************************************************************/
-char getkey(void)
+uint8_t getkey(void)
 {
-    char k;
+    uint8_t k;
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {

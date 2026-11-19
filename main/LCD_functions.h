@@ -23,12 +23,12 @@
 //Functions
 // mt void LCD_puts_f(char __flash *pFlashStr, char scrollmode);
 // mt jw writes : ...(char *pFlahsStr...
-void LCD_puts_f(const char *pFlashStr, char scrollmode);
-void LCD_puts(char *pStr, char scrollmode);
-void LCD_UpdateRequired(char update, char scrollmode);
+void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode);
+void LCD_puts(char *pStr, uint8_t scrollmode);
+void LCD_UpdateRequired(uint8_t update, uint8_t scrollmode);
 //mt void LCD_putc(char digit, char character);
 void LCD_putc(uint8_t digit, char character);
 void LCD_Clear(void);
-void LCD_Colon(char show);
+void LCD_Colon(uint8_t show);
 void LCD_FlashReset(void);
-char SetContrast(char input);
+uint8_t SetContrast(uint8_t input);

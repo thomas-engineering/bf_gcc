@@ -177,12 +177,12 @@ const char PLAYING[] PROGMEM   = "PLAYING";
 // mt: int __flash *pSong;     // pointer to the different songs in flash
 const __flash int *pSong;	// mt - pointer to the different songs in flash
 
-volatile char gPlaying = FALSE;
+volatile uint8_t gPlaying = FALSE;
 
-static char Volume   = 80;
-static char Duration = 0;
+static uint8_t Volume   = 80;
+static uint8_t Duration = 0;
 static uint8_t Tone  = 0;
-static char Tempo;
+static uint8_t Tempo;
 
 
 /*****************************************************************************
@@ -226,9 +226,9 @@ static void showSongName(uint8_t songnum)
     LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[songnum]), 1);  // mt   // Set up the a song in the LCD
 }
 
-char SelectSound(char input)
+uint8_t SelectSound(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     // mt static char song = 0;
     static uint8_t song = 0;
     
@@ -301,9 +301,9 @@ char SelectSound(char input)
 *   Purpose :       Start/stop timers, adjust volume 
 *
 *****************************************************************************/
-char Sound(char input)
+uint8_t Sound(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
 
     if (enter)
     {
@@ -396,7 +396,7 @@ void Play_Tune(void)
     uint16_t temp_tone;	// mt 200301
     int temp_hi;
     
-    char loop;
+    uint8_t loop;
     
     if(!Tone)
     {

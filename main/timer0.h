@@ -13,7 +13,7 @@ BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc);
 
 //mt 
 // char Timer0_AllocateCountdownTimer();
-char Timer0_AllocateCountdownTimer(void);
-char Timer0_GetCountdownTimer(char timer);
-void Timer0_SetCountdownTimer(char timer, char value);
-void Timer0_ReleaseCountdownTimer(char timer);
+uint8_t Timer0_AllocateCountdownTimer(void);
+uint8_t Timer0_GetCountdownTimer(uint8_t timer);
+void Timer0_SetCountdownTimer(uint8_t timer, uint8_t value);
+void Timer0_ReleaseCountdownTimer(uint8_t timer);

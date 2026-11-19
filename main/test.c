@@ -34,11 +34,11 @@
 #include "RTC.h"
 #include "dataflash.h"
 
-#define pLCDREG_test (*(char *)(0xEC))
+#define pLCDREG_test (*(uint8_t *)(0xEC))
 
 static void TestWaitEnter(void)
 {
-    char input = 0;
+    uint8_t input = 0;
     while(input != KEY_ENTER)
     {
         input = getkey();           // Read buttons
@@ -47,9 +47,9 @@ static void TestWaitEnter(void)
 
 void Test(void)
 {
-    char input = 0;
-    char i;
-    char j;
+    uint8_t input = 0;
+    uint8_t i;
+    uint8_t j;
     
     int integer;
     int temp_hi;

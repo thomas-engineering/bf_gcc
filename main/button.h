@@ -35,8 +35,8 @@
 void PinChangeInterrupt(void);
 void Button_ServiceClick(void);
 void Button_Init(void);
-char getkey(void);
-char ButtonBouncing(void);
+uint8_t getkey(void);
+uint8_t ButtonBouncing(void);
 
 extern volatile uint8_t gButtonTimeout;   // set in LCD_SOF_interrupt (LCD_driver.c)
 

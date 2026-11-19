@@ -51,19 +51,19 @@
 // Global variables
 /************************************************************************/
 // mt: volatiles added (based on jw patch)
-extern volatile char gLCD_Update_Required;
+extern volatile uint8_t gLCD_Update_Required;
 // mt: extern char LCD_Data[LCD_REGISTER_COUNT];
 extern volatile char gTextBuffer[TEXTBUFFER_SIZE + 1];   // +1: terminator
-extern volatile char gScrollMode;
-extern volatile char gFlashTimer;
-extern char gColon;
-extern volatile signed char gScroll;
-extern volatile char gAutoPressJoystick;
-extern volatile char gLCD_Start_Scroll_Timer;
+extern volatile uint8_t gScrollMode;
+extern volatile uint8_t gFlashTimer;
+extern uint8_t gColon;
+extern volatile int8_t gScroll;
+extern volatile uint8_t gAutoPressJoystick;
+extern volatile uint8_t gLCD_Start_Scroll_Timer;
 
 /************************************************************************/
 // Global functions
 /************************************************************************/
 void LCD_Init (void);
-void LCD_WriteDigit(char input, char digit);
-void LCD_AllSegments(char show);
+void LCD_WriteDigit(char input, uint8_t digit);
+void LCD_AllSegments(uint8_t show);

@@ -20,5 +20,5 @@
 //***************************************************************************
 
 // Function declarations
-char CHAR2BCD2(char input);
-uint16_t CHAR2BCD3(char input);
+uint8_t CHAR2BCD2(uint8_t input);
+uint16_t CHAR2BCD3(uint8_t input);

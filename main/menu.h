@@ -14,7 +14,7 @@ typedef struct
     uint8_t state;
     // char __flash *pText;
     PGM_P pText;
-    char (*pFunc)(char input);
+    uint8_t (*pFunc)(uint8_t input);
 } MENU_STATE;
 
 

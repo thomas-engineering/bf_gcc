@@ -1,12 +1,12 @@
 void Sound_Init(void);
-char SelectSound(char);
-char Sound(char);
+uint8_t SelectSound(uint8_t);
+uint8_t Sound(uint8_t);
 void Play_Tune(void);
 
 void PlayClick(void); // mt
 
 // global variable to prevent entering power save, when playing.
-extern volatile char gPlaying; 
+extern volatile uint8_t gPlaying; 
 
 #define DURATION_SEED 32  
 

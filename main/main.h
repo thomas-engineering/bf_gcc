@@ -7,13 +7,13 @@
 // main.h
 
 void Initialization(void);
-uint8_t StateMachine(char state, uint8_t stimuli);
-char BootFunc(char input);
-char PowerSaveFunc(char input);
-char AutoPower(char input);
-char KeyClick(char input);
+uint8_t StateMachine(uint8_t state, uint8_t stimuli);
+uint8_t BootFunc(uint8_t input);
+uint8_t PowerSaveFunc(uint8_t input);
+uint8_t AutoPower(uint8_t input);
+uint8_t KeyClick(uint8_t input);
 void Delay(uint16_t millisec);
-char Revision(char input);
+uint8_t Revision(uint8_t input);
 void OSCCAL_calibration(void);
 
 // Change the system clock prescaler. The CLKPCE/CLKPR write sequence must

@@ -72,13 +72,13 @@
 #include "vcard.h"
 #include "menu.h"
 
-#define pLCDREG_test (*(char *)(0xEC))
+#define pLCDREG_test (*(uint8_t *)(0xEC))
 
-char PowerSaveTimeout = 30;     // Initial value, enable power save mode after 30 min
+uint8_t PowerSaveTimeout = 30;     // Initial value, enable power save mode after 30 min
 BOOL AutoPowerSave    = TRUE;   // Variable to enable/disable the Auto Power Save func
 volatile BOOL gKeyClickStatus  = FALSE;  // Variable to enable/disable keyclick
 
-char PowerSave = FALSE;
+uint8_t PowerSave = FALSE;
 
 uint8_t state;  // holds the current state, according to "menu.h"
 
@@ -100,11 +100,11 @@ int main(void)
     uint8_t nextstate;
     // mt static char __flash *statetext;
     PGM_P statetext;
-    char (*pStateFunc)(char);
-    char input;
+    uint8_t (*pStateFunc)(uint8_t);
+    uint8_t input;
     uint8_t i, j; // char i;
-    char buttons;
-    char last_buttons;
+    uint8_t buttons;
+    uint8_t last_buttons;
 
     last_buttons='\0';  // mt
 
@@ -277,7 +277,7 @@ int main(void)
 *   Purpose :       Shifts between the different states
 *
 *****************************************************************************/
-uint8_t StateMachine(char cur_state, uint8_t stimuli)
+uint8_t StateMachine(uint8_t cur_state, uint8_t stimuli)
 {
     uint8_t nextstate = cur_state;    // Default stay in same state
     uint8_t i, j;
@@ -316,7 +316,7 @@ uint8_t StateMachine(char cur_state, uint8_t stimuli)
 *****************************************************************************/
 void Initialization(void)
 {
-    char tst;           // dummy
+    uint8_t tst;           // dummy
 
     (void)tst;          // avoid warning
     
@@ -374,9 +374,9 @@ void Initialization(void)
 *****************************************************************************/
 // mt - as in jw-patch: const char TEXT_BOOT[] PROGMEM	= "Jump to bootloader";
 
-char BootFunc(char input)
+uint8_t BootFunc(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if(enter)
     {
@@ -416,9 +416,9 @@ char BootFunc(char input)
 *****************************************************************************/
 // mt jw const char TEXT_POWER[]  PROGMEM  = "Press enter to sleep";
 
-char PowerSaveFunc(char input)
+uint8_t PowerSaveFunc(uint8_t input)
 {
-    static char enter = 1;    
+    static uint8_t enter = 1;    
     
     if(enter)
     {
@@ -459,7 +459,7 @@ char PowerSaveFunc(char input)
 
 static void AutoPowerShowMin(void)
 {
-	char PH,PL; 
+	uint8_t PH,PL; 
 	
 	PH = CHAR2BCD2(PowerSaveTimeout);
 	PL = (PH & 0x0F) + '0';
@@ -476,9 +476,9 @@ static void AutoPowerShowMin(void)
 	LCD_UpdateRequired(TRUE, 0);
 }
 
-char AutoPower(char input)
+uint8_t AutoPower(uint8_t input)
 {
-    static char enter = 1;    
+    static uint8_t enter = 1;    
     
     if(enter)
     {
@@ -545,7 +545,7 @@ char AutoPower(char input)
 *   Purpose :       Enable/Disable keyclick
 *
 *****************************************************************************/
-char KeyClick(char input)
+uint8_t KeyClick(uint8_t input)
 {
 	static uint8_t enter = 1;
 	uint8_t show;
@@ -616,9 +616,9 @@ void Delay(uint16_t millisec)
 *   Purpose :       Display the software revision
 *
 *****************************************************************************/
-char Revision(char input)
+uint8_t Revision(uint8_t input)
 {
-    static char enter = 1;
+    static uint8_t enter = 1;
     
     if(enter)
     {

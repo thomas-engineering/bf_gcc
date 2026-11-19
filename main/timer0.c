@@ -183,7 +183,7 @@ BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
 }
 
 
-char Timer0_AllocateCountdownTimer(void)
+uint8_t Timer0_AllocateCountdownTimer(void)
 {
     // mt char i;
     uint8_t i;
@@ -198,7 +198,7 @@ char Timer0_AllocateCountdownTimer(void)
     return 0;
 }
 
-void Timer0_SetCountdownTimer(char timer, char value)
+void Timer0_SetCountdownTimer(uint8_t timer, uint8_t value)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
@@ -206,9 +206,9 @@ void Timer0_SetCountdownTimer(char timer, char value)
     }
 }
 
-char Timer0_GetCountdownTimer(char timer)
+uint8_t Timer0_GetCountdownTimer(uint8_t timer)
 {
-    char t;
+    uint8_t t;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
         t = CountDownTimers[timer-1];
@@ -217,7 +217,7 @@ char Timer0_GetCountdownTimer(char timer)
     return t;
 }
 
-void Timer0_ReleaseCountdownTimer(char timer)
+void Timer0_ReleaseCountdownTimer(uint8_t timer)
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {

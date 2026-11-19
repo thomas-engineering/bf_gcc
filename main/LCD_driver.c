@@ -36,14 +36,14 @@
 
 // Variable from "button.c" to prevent button-bouncing
 
-volatile char gAutoPressJoystick = FALSE;
+volatile uint8_t gAutoPressJoystick = FALSE;
 
 // Used to indicate when the LCD interrupt handler should update the LCD
 // mt jw char gLCD_Update_Required = FALSE;
-volatile char gLCD_Update_Required = FALSE;
+volatile uint8_t gLCD_Update_Required = FALSE;
 
 // LCD display buffer (for double buffering).
-volatile char LCD_Data[LCD_REGISTER_COUNT];
+volatile uint8_t LCD_Data[LCD_REGISTER_COUNT];
 
 // Buffer that contains the text to be displayed
 // Note: Bit 7 indicates that this character is flashing
@@ -52,18 +52,18 @@ volatile char gTextBuffer[TEXTBUFFER_SIZE + 1];   // +1: terminator of a full-le
 // Only six letters can be shown on the LCD.
 // With the gScroll and gScrollMode variables,
 // one can select which part of the buffer to show
-volatile signed char gScroll;
-volatile char gScrollMode;
+volatile int8_t gScroll;
+volatile uint8_t gScrollMode;
 
 ////Start-up delay before scrolling a string over the LCD
-volatile char gLCD_Start_Scroll_Timer = 0;
+volatile uint8_t gLCD_Start_Scroll_Timer = 0;
 
 // The gFlashTimer is used to determine the on/off
 // timing of flashing characters
-volatile char gFlashTimer = 0;
+volatile uint8_t gFlashTimer = 0;
 
 // Turns on/off the colons on the LCD
-char gColon = 0;
+uint8_t gColon = 0;
 
 
 // Look-up table used when converting ASCII to
@@ -184,13 +184,13 @@ void LCD_Init(void)
 *                   (The LCD_displayData is latched in the LCD_SOF interrupt.)
 *
 *****************************************************************************/
-void LCD_WriteDigit(char c, char digit)
+void LCD_WriteDigit(char c, uint8_t digit)
 {
 
     uint16_t seg = 0x0000;                  // Holds the segment pattern
-    char mask, nibble;
-    volatile char *ptr;
-    char i;
+    uint8_t mask, nibble;
+    volatile uint8_t *ptr;
+    uint8_t i;
 
 
     if (digit > 5)                              // Skip if digit is illegal
@@ -241,7 +241,7 @@ void LCD_WriteDigit(char c, char digit)
 *   Purpose :       shows or hide all all LCD segments on the LCD
 *
 *****************************************************************************/
-void LCD_AllSegments(char show)
+void LCD_AllSegments(uint8_t show)
 {
     uint8_t i;
 
@@ -268,16 +268,16 @@ void LCD_AllSegments(char show)
 
 ISR(LCD_vect)
 {
-    static char LCD_timer = LCD_TIMER_SEED;
+    static uint8_t LCD_timer = LCD_TIMER_SEED;
     char c;
-    char c_flash;
-    char flash;
+    uint8_t c_flash;
+    uint8_t flash;
 
-    char EOL;
+    uint8_t EOL;
     uint8_t i;
 
-    static char timeout_count;
-    static char auto_joystick_count;
+    static uint8_t timeout_count;
+    static uint8_t auto_joystick_count;
 
     c_flash=0; // mt
     

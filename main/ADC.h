@@ -8,7 +8,7 @@
 
 //#define Vref                2.85
 
-void ADC_init(char );
+void ADC_init(uint8_t );
 int ADC_read(void);
 void ADC_periphery(void);
 
@@ -19,10 +19,10 @@ void ADC_StopAuto(void);
 void ADC_Service(void);
 
 // Temperature sensor function
-char TemperatureFunc(char);
+uint8_t TemperatureFunc(uint8_t);
 
 // Voltage reader function
-char VoltageFunc(char);
+uint8_t VoltageFunc(uint8_t);
 
 // Light sensor function
-char LightFunc(char);
+uint8_t LightFunc(uint8_t);

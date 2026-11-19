@@ -36,7 +36,7 @@
 *   Purpose :       Write byte(s) to the EEPROM
 *
 *****************************************************************************/
-void StoreEEPROM(char *pBuffer, char num_bytes, uint8_t* EE_START_ADR)
+void StoreEEPROM(char *pBuffer, uint8_t num_bytes, uint8_t* EE_START_ADR)
 {
     uint8_t i;
     for (i=0;i<num_bytes;i++) {
@@ -58,7 +58,7 @@ void StoreEEPROM(char *pBuffer, char num_bytes, uint8_t* EE_START_ADR)
 *
 *****************************************************************************/
 
-void LoadEEPROM(char *pBuffer, char num_bytes, uint8_t* EE_START_ADR)
+void LoadEEPROM(char *pBuffer, uint8_t num_bytes, uint8_t* EE_START_ADR)
 {
     uint8_t i;
     for (i=0;i<num_bytes;i++) {
