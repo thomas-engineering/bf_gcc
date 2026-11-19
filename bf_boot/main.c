@@ -488,8 +488,11 @@ unsigned char BufferLoad(unsigned int size, unsigned char mem)
 	
 	if (device == devtype)
 	{
-		if (mem == 'F')
+		if (mem == 'F' && (unsigned int)tempaddress < APP_END)	// never touch the bootloader section
 		{
+			// erase the page here, so the upload also works when the
+			// programmer does not send a chip erase (e.g. avrdude -D)
+			write_page(tempaddress & 0xFF80, (1<<PGERS) + (1<<SPMEN));
 
 			do {
 				data = gBuffer[cnt++];
