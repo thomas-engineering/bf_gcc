@@ -220,7 +220,7 @@ char EnterName(char input)
 		Name[indexps] = '\0';
 
 		// mt __EEPUT(EEPROM_START, indexps);   //store the length of name in EEPROM
-		eeprom_write_byte(EEPROM_START, indexps);
+		eeprom_update_byte(EEPROM_START, indexps);
 		StoreEEPROM(Name, indexps, EEPROM_START + 1);  //store the Name in EEPROM
 
 		enter = 1;
@@ -286,7 +286,7 @@ char RS232(char input)
                 enter = 1;
                         
                 // mt __EEPUT(EEPROM_START, temp_index);   //store the length of name in EEPROM
-                eeprom_write_byte(EEPROM_START, temp_index);
+                eeprom_update_byte(EEPROM_START, temp_index);
                 StoreEEPROM(Name, temp_index, EEPROM_START + 1);  //store the Name in EEPROM
                 
                 indexps = temp_index;

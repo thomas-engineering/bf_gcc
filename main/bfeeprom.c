@@ -39,7 +39,7 @@ void StoreEEPROM(char *pBuffer, char num_bytes, unsigned char* EE_START_ADR)
     unsigned char i;
     for (i=0;i<num_bytes;i++) {
         // mt __EEPUT(EEPROM_START_ADR++, pBuffer[i]); // Store parameters
-        eeprom_write_byte(EE_START_ADR, pBuffer[i]);
+        eeprom_update_byte(EE_START_ADR, pBuffer[i]);
         EE_START_ADR++;
     }
 }
