@@ -31,3 +31,6 @@ doc/*.pdf
 improvements.MD
 TODO.MD
 SESSION_START.MD
+
+# Scratch files (flash dumps etc.)
+tmp/
