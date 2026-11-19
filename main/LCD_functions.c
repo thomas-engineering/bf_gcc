@@ -64,10 +64,10 @@ void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode)
     for (i = 0; (const char)(pgm_read_byte(&pFlashStr[i])) && i < TEXTBUFFER_SIZE; i++)
     {
         // mt: gTextBuffer[i] = pFlashStr[i];
-        gTextBuffer[i] = pgm_read_byte(&pFlashStr[i]);
+        gTextBuffer[i] = LCD_CharToCode(pgm_read_byte(&pFlashStr[i]));   // translate once, here
     }
 
-    gTextBuffer[i] = '\0';
+    gTextBuffer[i] = LCD_CODE_END;
 
     if (i > 6)
     {
@@ -106,10 +106,10 @@ void LCD_puts(char *pStr, uint8_t scrollmode)
 
     for (i = 0; pStr[i] && i < TEXTBUFFER_SIZE; i++)
     {
-        gTextBuffer[i] = pStr[i];
+        gTextBuffer[i] = LCD_CharToCode(pStr[i]);   // translate once, here
     }
 
-    gTextBuffer[i] = '\0';
+    gTextBuffer[i] = LCD_CODE_END;
 
     if (i > 6)
     {
@@ -143,7 +143,7 @@ void LCD_puts(char *pStr, uint8_t scrollmode)
 void LCD_putc(uint8_t digit, char character)
 {
     if (digit < TEXTBUFFER_SIZE)
-        gTextBuffer[digit] = character;
+        gTextBuffer[digit] = LCD_CharToCode(character);
 }
 
 
@@ -163,9 +163,9 @@ void LCD_Clear(void)
     uint8_t i; // char i;
 
     for (i=0; i<TEXTBUFFER_SIZE; i++)
-        gTextBuffer[i] = ' ';
+        gTextBuffer[i] = LCD_CODE_BLANK;
 
-    gTextBuffer[0] = '\0'; // mt 5/2007
+    gTextBuffer[0] = LCD_CODE_END; // mt 5/2007
 }
 
 

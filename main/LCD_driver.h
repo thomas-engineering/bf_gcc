@@ -30,6 +30,12 @@
 #define LCD_REGISTER_COUNT      20
 #define TEXTBUFFER_SIZE         25
 
+// Codes stored in gTextBuffer (bit 7 = flashing, bits 0-6 = code)
+#define LCD_CODE_END            0x00    // end of the text
+#define LCD_CODE_BLANK          0x7F    // space or a character without a segment pattern
+//                              1..54   index into LCD_character_table + 1 ('*'..'_')
+#define LCD_CODE_FLASH          0x80
+
 #define SCROLLMODE_ONCE         0x01
 #define SCROLLMODE_LOOP         0x02
 #define SCROLLMODE_WAVE         0x03
@@ -37,11 +43,8 @@
 /************************************************************************/
 //MACROS
 /************************************************************************/
-//active = [TRUE;FALSE]
-#define LCD_SET_COLON(active) LCD_Data[8] = active
-
 // DEVICE SPECIFIC!!! (ATmega169)
-#define pLCDREG ((uint8_t *)(0xEC))
+#define pLCDREG ((volatile uint8_t *)(0xEC))
 
 // DEVICE SPECIFIC!!! (ATmega169) First LCD segment register
 #define LCD_CONTRAST_LEVEL(level) LCDCCR=((LCDCCR&0xF0)|(0x0F & level))
@@ -52,8 +55,9 @@
 /************************************************************************/
 // mt: volatiles added (based on jw patch)
 extern volatile uint8_t gLCD_Update_Required;
-// mt: extern char LCD_Data[LCD_REGISTER_COUNT];
-extern volatile char gTextBuffer[TEXTBUFFER_SIZE + 1];   // +1: terminator
+// Text as segment-table codes (see LCD_CharToCode), not as ASCII. Bit 7 marks a
+// flashing character. +1: room for the terminator of a full-length text.
+extern volatile uint8_t gTextBuffer[TEXTBUFFER_SIZE + 1];
 extern volatile uint8_t gScrollMode;
 extern volatile uint8_t gFlashTimer;
 extern uint8_t gColon;
@@ -65,5 +69,5 @@ extern volatile uint8_t gLCD_Start_Scroll_Timer;
 // Global functions
 /************************************************************************/
 void LCD_Init (void);
-void LCD_WriteDigit(char input, uint8_t digit);
+uint8_t LCD_CharToCode(char c);
 void LCD_AllSegments(uint8_t show);

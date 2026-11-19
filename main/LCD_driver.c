@@ -42,12 +42,10 @@ volatile uint8_t gAutoPressJoystick = FALSE;
 // mt jw char gLCD_Update_Required = FALSE;
 volatile uint8_t gLCD_Update_Required = FALSE;
 
-// LCD display buffer (for double buffering).
-volatile uint8_t LCD_Data[LCD_REGISTER_COUNT];
-
-// Buffer that contains the text to be displayed
-// Note: Bit 7 indicates that this character is flashing
-volatile char gTextBuffer[TEXTBUFFER_SIZE + 1];   // +1: terminator of a full-length text
+// Buffer that contains the text to be displayed as segment-table codes
+// (LCD_CODE_*, filled by LCD_CharToCode). Bit 7 indicates that this character
+// is flashing. +1: terminator of a full-length text.
+volatile uint8_t gTextBuffer[TEXTBUFFER_SIZE + 1];
 
 // Only six letters can be shown on the LCD.
 // With the gScroll and gScrollMode variables,
@@ -65,6 +63,15 @@ volatile uint8_t gFlashTimer = 0;
 // Turns on/off the colons on the LCD
 uint8_t gColon = 0;
 
+
+
+// Two ideas in this file come from Dean Camera's ("abcminiuser") rewrite of
+// the Butterfly LCD driver (ButtLoad, 2007, https://github.com/abcminiuser/buttload,
+// GPLv2). They are implemented here independently, no code was copied:
+//  1. Characters are translated to segment-table codes when the text is
+//     stored (LCD_CharToCode), so the LCD interrupt only does the table lookup.
+//  2. The LCD interrupt writes the segments directly to the LCD data
+//     registers; there is no RAM copy (LCD_Data) of them any more.
 
 // Look-up table used when converting ASCII to
 // LCD display data (segment control)
@@ -135,13 +142,13 @@ const __flash uint16_t LCD_character_table[] =
 *
 *   Parameters :    None
 *
-*   Purpose :       Initialize LCD_displayData buffer.
+*   Purpose :       Clear the LCD data registers.
 *                   Set up the LCD (timing, contrast, etc.)
 *
 *****************************************************************************/
 void LCD_Init(void)
 {
-    LCD_AllSegments(FALSE);                     // Clear segment buffer.
+    LCD_AllSegments(FALSE);                     // Clear the LCD registers.
 
     LCD_CONTRAST_LEVEL(LCD_INITIAL_CONTRAST);    //Set the LCD contrast level
 
@@ -170,44 +177,64 @@ void LCD_Init(void)
 
 /*****************************************************************************
 *
-*   Function name : LCD_WriteDigit(char c, char digit)
+*   Function name : LCD_CharToCode(char c)
+*
+*   Returns :       The code stored in gTextBuffer for this character
+*
+*   Parameters :    c: ASCII character; bit 7 set = flashing character
+*
+*   Purpose :       Translates a character once, when the text is stored, so
+*                   that the LCD interrupt does not have to (idea from
+*                   Dean Camera's driver, see the top of this file).
+*                   '*'..'_' and 'a'..'z' (as upper case) get table index + 1,
+*                   '\0' ends the text, everything else is a blank.
+*
+*****************************************************************************/
+uint8_t LCD_CharToCode(char c)
+{
+    uint8_t flash = (uint8_t)c & LCD_CODE_FLASH;
+
+    c &= 0x7F;
+
+    if (c == '\0')
+        return LCD_CODE_END;
+
+    if (c >= 'a' && c <= 'z')                   // Convert to upper case
+        c &= ~0x20;
+
+    if (c >= '*' && c <= '_')
+        return (uint8_t)(c - '*' + 1) | flash;
+
+    return LCD_CODE_BLANK | flash;
+}
+
+
+/*****************************************************************************
+*
+*   Function name : LCD_WriteCode(uint8_t code, uint8_t digit)
 *
 *   Returns :       None
 *
-*   Parameters :    Inputs
-*                   c: The symbol to be displayed in a LCD digit
+*   Parameters :    code: LCD_CODE_* / table index + 1 (bit 7 is ignored)
 *                   digit: In which digit (0-5) the symbol should be displayed
 *                   Note: Digit 0 is the first used digit on the LCD,
 *                   i.e LCD digit 2
 *
-*   Purpose :       Stores LCD control data in the LCD_displayData buffer.
-*                   (The LCD_displayData is latched in the LCD_SOF interrupt.)
+*   Purpose :       Writes the segments of one digit directly to the LCD data
+*                   registers (no RAM copy, idea from Dean Camera's driver).
+*                   Called from the LCD start of frame interrupt.
 *
 *****************************************************************************/
-void LCD_WriteDigit(char c, uint8_t digit)
+static inline void LCD_WriteCode(uint8_t code, uint8_t digit)
 {
-
     uint16_t seg = 0x0000;                  // Holds the segment pattern
     uint8_t mask, nibble;
     volatile uint8_t *ptr;
     uint8_t i;
 
-
-    if (digit > 5)                              // Skip if digit is illegal
-        return;
-
-    //Lookup character table for segmet data
-    if ((c >= '*') && (c <= 'z'))
-    {
-        // c is a letter
-        if (c >= 'a')                           // Convert to upper case
-            c &= ~0x20;                         // if necessarry
-
-        c -= '*';
-
-        //mt seg = LCD_character_table[c];
-        seg = LCD_character_table[(uint8_t)c]; 
-    }
+    code &= 0x7F;
+    if (code != LCD_CODE_END && code != LCD_CODE_BLANK)
+        seg = LCD_character_table[code - 1];
 
     // Adjust mask according to LCD segment mapping
     if (digit & 0x01)
@@ -215,7 +242,7 @@ void LCD_WriteDigit(char c, uint8_t digit)
     else
         mask = 0xF0;                // Digit 0, 2, 4
 
-    ptr = LCD_Data + (digit >> 1);  // digit = {0,0,1,1,2,2}
+    ptr = pLCDREG + (digit >> 1);   // digit = {0,0,1,1,2,2}
 
     for (i = 0; i < 4; i++)
     {
@@ -250,7 +277,7 @@ void LCD_AllSegments(uint8_t show)
 
     // Set/clear all bits in all LCD registers
     for (i=0; i < LCD_REGISTER_COUNT; i++)
-        *(LCD_Data + i) = show;
+        *(pLCDREG + i) = show;
 }
 
 
@@ -269,7 +296,7 @@ void LCD_AllSegments(uint8_t show)
 ISR(LCD_vect)
 {
     static uint8_t LCD_timer = LCD_TIMER_SEED;
-    char c;
+    uint8_t c;                      // segment code, see LCD_CharToCode()
     uint8_t c_flash;
     uint8_t flash;
 
@@ -353,26 +380,22 @@ ISR(LCD_vect)
             {
                 // We have some visible characters
                 c = gTextBuffer[i + gScroll];
-                c_flash = c & 0x80 ? 1 : 0;
+                c_flash = c & LCD_CODE_FLASH ? 1 : 0;
                 c = c & 0x7F;
 
-                if (c == '\0')
+                if (c == LCD_CODE_END)
                     EOL = i+1;      // End of character data
             }
             else
-                c = ' ';
+                c = LCD_CODE_BLANK;
 
             // Check if this character is flashing
 
             if (c_flash && flash)
-                LCD_WriteDigit(' ', i);
+                LCD_WriteCode(LCD_CODE_BLANK, i);
             else
-                LCD_WriteDigit(c, i);
+                LCD_WriteCode(c, i);
         }
-
-        // Copy the segment buffer to the real segments
-        for (i = 0; i < LCD_REGISTER_COUNT; i++)
-            *(pLCDREG + i) = *(LCD_Data+i);
 
         // Handle colon
         if (gColon)

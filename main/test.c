@@ -142,6 +142,11 @@ void Test(void)
     // mt while((PINB & (1<<PORTB4)));    //pull PINB cause the LCD interrupt is disabled which 
     while((PINB & (1<<PINB4)));    //pull PINB cause the LCD interrupt is disabled which
                                    //controls the button-bouncing
+
+    // The LCD interrupt only writes the digits and the colon (no RAM copy of
+    // all registers any more), so clear the 0xFF test pattern here.
+    LCD_AllSegments(FALSE);
+
     sbiBF(LCDCRA, LCDIE);
 
 
