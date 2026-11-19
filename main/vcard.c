@@ -253,14 +253,8 @@ char RS232(char input)
     
     if (enter)
     {
-        cli(); // mt __disable_interrupt();
-        
         // boost IntRC to 2Mhz to achieve 19200 baudrate
-        CLKPR = (1<<CLKPCE);        // set Clock Prescaler Change Enable
-        // set prescaler = 4, Inter RC 8Mhz / 4 = 2Mhz
-        CLKPR = (1<<CLKPS1);
-        
-        sei(); // mt __enable_interrupt();
+        SetClockPrescaler(CLOCK_2MHZ);
         
         // mt jw-meth: LCD_puts_f(TEXT_WAIT, 0);
         LCD_puts_f(PSTR("waiting for input on RS232"), 0);
@@ -280,13 +274,7 @@ char RS232(char input)
         }
         else    // UART transmission completed
         {
-            cli(); // mt __disable_interrupt();
-                
-            CLKPR = (1<<CLKPCE);        // set Clock Prescaler Change Enable
-            // set prescaler = 8, Inter RC 8Mhz / 8 = 1Mhz
-            CLKPR = (1<<CLKPS1) | (1<<CLKPS0);
-                
-            sei(); // mt __enable_interrupt();
+            SetClockPrescaler(CLOCK_1MHZ);
                 
             if(temp_index)
             {
@@ -319,13 +307,7 @@ char RS232(char input)
     {
         enter = 1;
         
-        cli(); // mt __disable_interrupt();
-        
-        CLKPR = (1<<CLKPCE);        // set Clock Prescaler Change Enable
-        // set prescaler = 8, Inter RC 8Mhz / 8 = 1Mhz
-        CLKPR = (1<<CLKPS1) | (1<<CLKPS0);
-        
-        sei(); // __enable_interrupt();
+        SetClockPrescaler(CLOCK_1MHZ);
         
         gUART = FALSE;
         return ST_VCARD_DOWNLOAD_NAME;

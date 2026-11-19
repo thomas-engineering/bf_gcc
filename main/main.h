@@ -16,6 +16,22 @@ void Delay(unsigned int millisec);
 char Revision(char input);
 void OSCCAL_calibration(void);
 
+// Change the system clock prescaler. The CLKPCE/CLKPR write sequence must
+// complete within 4 cycles, so interrupts are blocked around it.
+#include <stdint.h>
+#include <avr/io.h>
+#include <util/atomic.h>
+static inline void SetClockPrescaler(uint8_t clkps)
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        CLKPR = (1<<CLKPCE);
+        CLKPR = clkps;
+    }
+}
+#define CLOCK_1MHZ  ((1<<CLKPS1) | (1<<CLKPS0))   // 8 MHz internal RC / 8
+#define CLOCK_2MHZ  (1<<CLKPS1)                   // 8 MHz internal RC / 4
+
 #define BOOL    char
 
 #ifndef FALSE

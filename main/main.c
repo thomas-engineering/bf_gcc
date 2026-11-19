@@ -329,10 +329,8 @@ void Initialization(void)
     
     OSCCAL_calibration();       // calibrate the OSCCAL byte
         
-    CLKPR = (1<<CLKPCE);        // set Clock Prescaler Change Enable
-
     // set prescaler = 8, Inter RC 8Mhz / 8 = 1Mhz
-    CLKPR = (1<<CLKPS1) | (1<<CLKPS0);
+    SetClockPrescaler(CLOCK_1MHZ);
 
     // Disable Analog Comparator (power save)
     ACSR = (1<<ACD);
@@ -681,10 +679,8 @@ void OSCCAL_calibration(void)
     int temp;
     unsigned char tempL;
 
-    CLKPR = (1<<CLKPCE);        // set Clock Prescaler Change Enable
-    // set prescaler = 8, Inter RC 8Mhz / 8 = 1Mhz
-    CLKPR = (1<<CLKPS1) | (1<<CLKPS0);
-    
+    SetClockPrescaler(CLOCK_1MHZ);
+
     TIMSK2 = 0;             //disable OCIE2A and TOIE2
 
     ASSR = (1<<AS2);        //select asynchronous operation of timer2 (32,768kHz)
