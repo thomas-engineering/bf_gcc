@@ -50,7 +50,7 @@
 const char TEXT_SONG1[] PROGMEM      = "Fur Elise";
 
 // __flash int FurElise[] =   
-const int FurElise[] PROGMEM=   
+const __flash int FurElise[] =   
         {
             3, 
             8,e2, 8,xd2, 8,e2, 8,xd2, 8,e2, 8,b1, 8,d2, 8,c2, 4,a1, 8,p, 
@@ -65,7 +65,7 @@ const int FurElise[] PROGMEM=
 const char TEXT_SONG2[] PROGMEM  = "Turkey march";
 
 //__flash int Mozart[] = 
-const int Mozart[] PROGMEM = 
+const __flash int Mozart[] = 
         {
             3, 
             16,xf1, 16,e1, 16,xd1, 16,e1, 4,g1, 16,a1, 16,g1, 16,xf1, 16,g1,
@@ -80,7 +80,7 @@ const int Mozart[] PROGMEM =
 // well, the gcc-geek wants all the songs ;-)
 const char TEXT_SONG3[] PROGMEM      = "Minuet";
 
-const int Minuet[] PROGMEM = 
+const __flash int Minuet[] = 
         {
             2, 
             4,d2, 8,g1, 8,a1, 8,b1, 8,c2, 4,d2, 4,g1, 4,g1, 4,e2, 8,c2, 
@@ -93,7 +93,7 @@ const int Minuet[] PROGMEM =
 
 const char TEXT_SONG4[] PROGMEM    = "Auld Lang Syne";
 
-const int AuldLangSyne[] PROGMEM = 
+const __flash int AuldLangSyne[] = 
         {  
             3, 
             4,g2, 2,c3, 8,c3, 4,c3, 4,e3, 2,d3, 8,c3, 4,d3, 8,e3, 8,d3, 2,c3, 
@@ -107,7 +107,7 @@ const int AuldLangSyne[] PROGMEM =
 const char TEXT_SONG5[] PROGMEM =   "Sirene1";
 
 //__flash int Sirene1[] = 
-const int Sirene1[] PROGMEM = 
+const __flash int Sirene1[] = 
         {
             0,
             32,400, 32,397, 32,394, 32,391, 32,388, 32,385, 32,382, 32,379,
@@ -126,7 +126,7 @@ const int Sirene1[] PROGMEM =
 const char TEXT_SONG6[] PROGMEM =   "Sirene2";
 
 //__flash int Sirene2[] = 
-const int Sirene2[] PROGMEM = 
+const __flash int Sirene2[] = 
         {
             3, 
             4,c2, 4,g2, 
@@ -138,7 +138,7 @@ const int Sirene2[] PROGMEM =
 const char TEXT_SONG7[] PROGMEM      =   "Whistle";
 
 //__flash int Whistle[] = 
-const int Whistle[] PROGMEM = 
+const __flash int Whistle[] = 
         {
             0, 
             32,200, 32,195, 32,190, 32,185, 32,180, 32,175, 32,170, 32,165,  
@@ -153,7 +153,7 @@ const int Whistle[] PROGMEM =
 
 // "Exorzist" added by Martin Thomas (based on demo from the AT90CAN-Library 3.1)
 const char TEXT_SONG8[] PROGMEM   =   "Exorzist";
-const int Exorcist[] PROGMEM =
+const __flash int Exorcist[] =
         {
         21,
         144,E2, 144,A2, 144,E2, 144,B2, 144,E2, 144,G2, 144,A2, 144,E2,
@@ -165,7 +165,7 @@ const int Exorcist[] PROGMEM =
         };
 
 // pointer-array with pointers to the song arrays
-const int * const Songs[] PROGMEM   = { FurElise, Mozart, Minuet, AuldLangSyne, Sirene1, Sirene2, Whistle, Exorcist, 0 };
+const __flash int * const __flash Songs[] = { FurElise, Mozart, Minuet, AuldLangSyne, Sirene1, Sirene2, Whistle, Exorcist, 0 };
 
 PGM_P const TEXT_SONG_TBL[] PROGMEM   = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, TEXT_SONG8, 0 };
 // const char *TEXT_SONG_TBL[]    = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, 0};
@@ -174,13 +174,13 @@ PGM_P const TEXT_SONG_TBL[] PROGMEM   = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TE
 const char PLAYING[] PROGMEM   = "PLAYING";
 
 // mt: int __flash *pSong;     // pointer to the different songs in flash
-const int *pSong;	// mt - pointer to the different songs in flash
+const __flash int *pSong;	// mt - pointer to the different songs in flash
 
 volatile char gPlaying = FALSE;
 
 static char Volume   = 80;
 static char Duration = 0;
-static char Tone     = 0;
+static uint8_t Tone  = 0;
 static char Tempo;
 
 
@@ -240,7 +240,7 @@ char SelectSound(char input)
         showSongName(song);
 
         // mt pSong = Songs[song];            // point to this song             
-        pSong=(int*)pgm_read_word(&Songs[song]); // looks too complicated...
+        pSong=Songs[song]; // looks too complicated...
 
     }      
         
@@ -259,7 +259,7 @@ char SelectSound(char input)
         showSongName(song);
         
         // mt pSong = Songs[song];
-        pSong=(int*)pgm_read_word(&Songs[song]); 
+        pSong=Songs[song]; 
 
     }    
     else if (input == KEY_MINUS)    // shift to next song
@@ -273,7 +273,7 @@ char SelectSound(char input)
         showSongName(song);
         
         // mt pSong = Songs[song];
-        pSong=(int*)pgm_read_word(&Songs[song]);
+        pSong=Songs[song];
     }  
     else if(input == KEY_ENTER)     // start playing
     {
@@ -401,7 +401,7 @@ void Play_Tune(void)
     {
         Duration = 0;   
         // mt Tempo = *(pSong + 0);
-        Tempo = (uint8_t)pgm_read_word(pSong + 0);
+        Tempo = (uint8_t)pSong[0];
         Tone = 1;   //Start the song from the beginning
     }
     
@@ -412,16 +412,16 @@ void Play_Tune(void)
             Duration--;
         }
         // mt: else if(*(pSong + Tone))    // If not the end of the song
-        else if(pgm_read_word(pSong + Tone))  // If not the end of the song
+        else if((uint16_t)pSong[Tone])  // If not the end of the song
         {
             // mt: Duration = ( DURATION_SEED / *(pSong + Tone) );  // store the duration
-            Duration = ( DURATION_SEED / pgm_read_word(pSong + Tone) );  // store the duration
+            Duration = ( DURATION_SEED / (uint16_t)pSong[Tone] );  // store the duration
         
             Tone++;                     // point to the next tone in the Song-table        
 
-            temp_tone=pgm_read_word(pSong + Tone); // mt 200301
+            temp_tone=(uint16_t)pSong[Tone]; // mt 200301
             // mt: if( (*(pSong + Tone) == p) | (*(pSong + Tone) == P) ) // if pause
-            // if( (pgm_read_word(pSong + Tone) == p) | (pgm_read_word(pSong + Tone) == P) ) // if pause
+            // if( ((uint16_t)pSong[Tone] == p) | ((uint16_t)pSong[Tone] == P) ) // if pause
             if( (temp_tone == p) || (temp_tone == P) ) // if pause
                 cbiBF(TCCR1B, CS10);             // stop Timer1, prescaler(1)    
             else 
@@ -430,7 +430,7 @@ void Play_Tune(void)
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
                 // mt temp_hi = *(pSong + Tone);      // read out the PWM-value
-                // temp_hi = pgm_read_word(pSong + Tone);      // read out the PWM-value
+                // temp_hi = (uint16_t)pSong[Tone];      // read out the PWM-value
                 temp_hi = temp_tone;   // mt 200301
                 temp_hi >>= 8;                  // move integer 8 bits to the rigth
                 
@@ -439,7 +439,7 @@ void Play_Tune(void)
             
                 ICR1H = temp_hi;                // load ICR1H/L
                 // mt: ICR1L = *(pSong + Tone);        
-                // ICR1L = pgm_read_word(pSong + Tone);
+                // ICR1L = (uint16_t)pSong[Tone];
                 ICR1L = temp_tone;
             }
             
@@ -450,7 +450,7 @@ void Play_Tune(void)
             Tone++;         // point to the next tone in the Song-table        
             
             // mt: loop = *(pSong + Tone); // get the byte that tells if the song should loop or not
-            loop = (uint8_t)pgm_read_word(pSong + Tone); // get the byte that tells if the song should loop or not
+            loop = (uint8_t)pSong[Tone]; // get the byte that tells if the song should loop or not
             
             if( loop )  
             {
@@ -469,7 +469,7 @@ void Play_Tune(void)
         }
         
         // mt: Tempo = *(pSong + 0);
-        Tempo = (uint8_t)pgm_read_word(pSong + 0);
+        Tempo = (uint8_t)pSong[0];
     }
     else
         Tempo--;
