@@ -41,6 +41,13 @@ board.h, bool/stdint types, and in the bootloader: page erase in BufferLoad
 in programming mode, no jump to an erased application.
 Host unit tests: "make -C tests".
 
+(Remark from Claude, ISR review, tested on the board:)
+Key click and ADC measurement are no longer done inside the interrupts (the
+ISRs set a flag, the main loop does the work). PCINT1 is an alias of the
+PCINT0 handler, the Timer0 callback pointers are written atomically, and
+Name/gTextBuffer got one byte more (a 25 character name overwrote the next
+variable). Fixed the -Wold-style-definition/-Wmissing-prototypes warnings.
+
 18. Nov. 2026
 
 Tested with avr-gcc 7.3.0, avr-libc 2.0.0 (Arduino package)
