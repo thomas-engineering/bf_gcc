@@ -26,3 +26,8 @@ gdbinit
 
 # Atmel documentation PDFs (kept locally only)
 doc/*.pdf
+
+# Private working notes (not published)
+improvements.MD
+TODO.MD
+SESSION_START.MD
