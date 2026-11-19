@@ -66,7 +66,7 @@ char vCard(char input)
 
 	if (enter)
 	{
-		indexps=eeprom_read_byte(EEPROM_START);
+		indexps=eeprom_read_byte(&EEPROM_VCARD->length);
 
 		if((indexps < 1) || (indexps > STRLENGHT))   // if illegal length / mt: fixed, was: |    
 		{
@@ -77,7 +77,7 @@ char vCard(char input)
 		}
 		else
 		{
-			LoadEEPROM(Name, indexps, (EEPROM_START + 1));  // Load name 
+			LoadEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  // Load name 
 			LCD_puts(Name, 1);
 			enter = 0;
 		}
@@ -121,7 +121,7 @@ char EnterName(char input)
 
 	if (enter)
 	{
-		LoadEEPROM(Name, indexps, EEPROM_START + 1);  // Load name from EEPROM
+		LoadEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  // Load name from EEPROM
 
 		if(indexps) {
 			indexps -= 1; // set work-char to last char (not the tailing \0)
@@ -214,8 +214,8 @@ char EnterName(char input)
 		indexps++;
 		Name[indexps] = '\0';
 
-		eeprom_update_byte(EEPROM_START, indexps);
-		StoreEEPROM(Name, indexps, EEPROM_START + 1);  //store the Name in EEPROM
+		eeprom_update_byte(&EEPROM_VCARD->length, indexps);
+		StoreEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  //store the Name in EEPROM
 
 		enter = 1;
 		return ST_VCARD_FUNC;
@@ -278,8 +278,8 @@ char RS232(char input)
                 
                 enter = 1;
                         
-                eeprom_update_byte(EEPROM_START, temp_index);
-                StoreEEPROM(Name, temp_index, EEPROM_START + 1);  //store the Name in EEPROM
+                eeprom_update_byte(&EEPROM_VCARD->length, temp_index);
+                StoreEEPROM(Name, temp_index, (uint8_t *)EEPROM_VCARD->name);  //store the Name in EEPROM
                 
                 indexps = temp_index;
                 
