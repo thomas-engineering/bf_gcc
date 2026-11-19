@@ -46,6 +46,7 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include <avr/version.h>
+#include <util/delay.h>
 
 #if __AVR_LIBC_VERSION__ < 10405UL
 #warning "avr-libc >= version 1.4.5 recommended"
@@ -591,13 +592,10 @@ char KeyClick(char input)
 *****************************************************************************/
 void Delay(uint16_t millisec)
 {
-	// mt, int i did not work in the simulator:  int i; 
-	uint8_t i;
-
+	// busy-wait, calibrated by the compiler from F_CPU (1 MHz in this project).
+	// Must not be called while the clock prescaler is changed (RS232 mode, 2 MHz).
 	while (millisec--) {
-		for (i=0; i<125; i++) {
-			asm volatile ("nop"::);
-		}
+		_delay_ms(1);
 	}
 }
 
