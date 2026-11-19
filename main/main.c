@@ -560,7 +560,7 @@ char KeyClick(char input)
 	}
 
 	if ( (input == KEY_PLUS) || (input == KEY_MINUS) ) {
-		gKeyClickStatus = ~gKeyClickStatus;
+		gKeyClickStatus = !gKeyClickStatus;
 		show = 1;
 	}
 

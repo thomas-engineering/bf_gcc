@@ -32,18 +32,15 @@ static inline void SetClockPrescaler(uint8_t clkps)
 #define CLOCK_1MHZ  ((1<<CLKPS1) | (1<<CLKPS0))   // 8 MHz internal RC / 8
 #define CLOCK_2MHZ  (1<<CLKPS1)                   // 8 MHz internal RC / 4
 
-#define BOOL    char
+#include <stdbool.h>
+#include <stddef.h>      // NULL
+
+#define BOOL    bool
 
 extern volatile BOOL gKeyClickStatus;   // keyclick on/off, defined in main.c
 
-#ifndef FALSE
-#define FALSE   0
-#define TRUE    (!FALSE)
-#endif
-
-#ifndef NULL
-#define NULL    0
-#endif
+#define FALSE   false
+#define TRUE    true
 
 #define AUTO    3
 
@@ -51,8 +48,8 @@ extern volatile BOOL gKeyClickStatus;   // keyclick on/off, defined in main.c
 // sbi and cbi are not longer supported by the avr-libc
 // to avoid version-conflicts the macro-names have been 
 // changed to sbiBF/cbiBF "everywhere"
-#define sbiBF(port,bit)  (port |= (1<<bit))   //set bit in port
-#define cbiBF(port,bit)  (port &= ~(1<<bit))  //clear bit in port
+#define sbiBF(port,bit)  ((port) |= (1<<(bit)))    //set bit in port
+#define cbiBF(port,bit)  ((port) &= ~(1<<(bit)))   //clear bit in port
 
 // Menu state machine states
 #define ST_AVRBF                        10

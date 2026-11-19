@@ -39,7 +39,7 @@ volatile unsigned char gButtonTimeout = FALSE;
 
 //char KEY = NULL;
 //char KEY_VALID = FALSE;
-volatile char KEY = NULL;
+volatile char KEY = KEY_NULL;
 volatile char KEY_VALID = FALSE;
 
 char CountdownTimerHandle;

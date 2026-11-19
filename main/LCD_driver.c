@@ -34,12 +34,6 @@
 #include "button.h"
 #include "LCD_driver.h"
 
-#ifndef BOOL
-#define BOOL    char
-#define FALSE   0
-#define TRUE    (!FALSE)
-#endif
-
 // Variable from "button.c" to prevent button-bouncing
 
 volatile char gAutoPressJoystick = FALSE;

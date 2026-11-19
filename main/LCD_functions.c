@@ -33,9 +33,6 @@
 #include "button.h"
 
 
-#define FALSE   0
-#define TRUE    (!FALSE)
-
 // mt char CONTRAST = LCD_INITIAL_CONTRAST;
 uint8_t CONTRAST = LCD_INITIAL_CONTRAST;
 
