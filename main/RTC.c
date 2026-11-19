@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "calendar.h"
 #include <util/atomic.h>
 #include <avr/pgmspace.h>
 #include "button.h"
@@ -51,7 +52,6 @@ uint8_t dateformat = 0;
 // Lookup table holding the length of each mont. The first element is a dummy.
 // mt this could be placed in progmem too, but the arrays are accessed quite
 //    often - so leaving them in RAM is better...
-char MonthLength[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 char TBL_CLOCK_12[] =   // table used when displaying 12H clock  
 {12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -474,9 +474,6 @@ char SetDate(char input)
 	static uint8_t mode = DAY;
 	uint8_t YH, YL, MH, ML, DH, DL;
 	uint8_t MonthLength_temp;
-	uint8_t LeapMonth;
-    uint16_t cur_year;
-    uint8_t cur_month, cur_day;
 
     if (enter_function)
     {
@@ -581,26 +578,8 @@ char SetDate(char input)
     if (date[MONTH] > 12)
         date[MONTH] = 1;
 
-    // Check for leap year, if month == February
-    GetDate(&cur_year, &cur_month, &cur_day);
-    if (cur_month == 2)
-        if (!(cur_year & 0x0003))           // if (cur_year%4 == 0)
-            if (cur_year%100 == 0)
-                if (cur_year%400 == 0)
-                    LeapMonth = 1;
-                else
-                    LeapMonth = 0;
-            else
-                LeapMonth = 1;
-        else
-            LeapMonth = 0;
-    else
-        LeapMonth = 0;
-
-    if (LeapMonth)
-        MonthLength_temp = 29;
-    else
-        MonthLength_temp = MonthLength[date[MONTH]];
+    // number of days of the month that is being set (leap years included)
+    MonthLength_temp = days_in_month(date[YEAR], date[MONTH]);
     
     if (date[DAY] == 0)
         date[DAY] = MonthLength_temp;
@@ -675,8 +654,6 @@ char SetDateFormat(char input)
 // SIGNAL(SIG_OVERFLOW2)
 ISR(TIMER2_OVF_vect)
 {
-    static char LeapMonth;
-
     gSECOND++;               // increment second
 
     if (gSECOND == 60)
@@ -697,23 +674,8 @@ ISR(TIMER2_OVF_vect)
                 gHOUR = 0;
                 gDAY++;
 
-                // Check for leap year if month == February
-                if (gMONTH == 2)
-                    if (!(gYEAR & 0x0003))              // if (gYEAR%4 == 0)
-                        if (gYEAR%100 == 0)
-                            if (gYEAR%400 == 0)
-                                LeapMonth = 1;
-                            else
-                                LeapMonth = 0;
-                        else
-                            LeapMonth = 1;
-                    else
-                        LeapMonth = 0;
-                else
-                    LeapMonth = 0;
-
                 // Now, we can check for month length
-                if (gDAY > (MonthLength[gMONTH] + LeapMonth))
+                if (gDAY > days_in_month(gYEAR, gMONTH))
                 {
                     gDAY = 1;
                     gMONTH++;
