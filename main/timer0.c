@@ -137,7 +137,11 @@ BOOL Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
     {
         if (CallbackFunc[i] == NULL)
         {
-            CallbackFunc[i] = pFunc;
+            // 16-bit store: the ISR must not see a half-written pointer
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                CallbackFunc[i] = pFunc;
+            }
             return TRUE;
         }   
     }
@@ -167,7 +171,10 @@ BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
     {
         if (CallbackFunc[i] == pFunc)
         {
-            CallbackFunc[i] = NULL;
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                CallbackFunc[i] = NULL;
+            }
             return TRUE;
         }
     }
