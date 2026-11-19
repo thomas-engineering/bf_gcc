@@ -34,7 +34,7 @@
 #include "LCD_functions.h"
 #include "timer0.h"
 
-const __flash int TEMP_Celsius_pos[] =    // Positive Celsius temperatures (ADC-value)
+const __flash uint16_t TEMP_Celsius_pos[] =    // Positive Celsius temperatures (ADC-value)
         {                           // from 0 to 60 degrees
             806,796,786,775,765,754,743,732,720,709,697,685,673,661,649,
             636,624,611,599,586,574,562,549,537,524,512,500,488,476,464,
@@ -43,12 +43,12 @@ const __flash int TEMP_Celsius_pos[] =    // Positive Celsius temperatures (ADC-
             187,
         };
 
-const __flash int TEMP_Celsius_neg[] =    // Negative Celsius temperatures (ADC-value)
+const __flash uint16_t TEMP_Celsius_neg[] =    // Negative Celsius temperatures (ADC-value)
         {                           // from -1 to -15 degrees
             815,825,834,843,851,860,868,876,883,891,898,904,911,917,923,
         };
 
-const __flash int TEMP_Fahrenheit_pos[] =  // Positive Fahrenheit temperatures (ADC-value)
+const __flash uint16_t TEMP_Fahrenheit_pos[] =  // Positive Fahrenheit temperatures (ADC-value)
 		{                           // from 0 to 140 degrees
 			938, 935, 932, 929, 926, 923, 920, 916, 913, 909, 906, 902, 898, 
 			894, 891, 887, 882, 878, 874, 870, 865, 861, 856, 851, 847, 842, 
@@ -64,7 +64,7 @@ const __flash int TEMP_Fahrenheit_pos[] =  // Positive Fahrenheit temperatures (
 		};
 
         
-const __flash int LIGHT_ADC[] = // Table used to find the Vref, when using the voltage-reading function 
+const __flash uint16_t LIGHT_ADC[] = // Table used to find the Vref, when using the voltage-reading function 
         { 
             0x35,0x60,0x80,0x0B0,0x11D,0x13D,0x15A,0x17A,0x197,0x1B9,0x1DA,
             0x1F9,0x216,0x240,0x26D,0x282,0x2A2,0x2EF,0x332,0x3B0,0x3F2
@@ -114,12 +114,12 @@ void ADC_init(uint8_t input)
 *   Purpose :       Do a Analog to Digital Conversion
 *
 *****************************************************************************/
-int ADC_read(void)
+uint16_t ADC_read(void)
 {
     uint8_t i;
-    int ADC_temp;
+    uint16_t ADC_temp;
     // mt int ADC = 0 ;
-    int ADCr = 0;
+    uint16_t ADCr = 0;
     
     // To save power, the voltage over the LDR and the NTC is turned off when not used
     // This is done by controlling the voltage from a I/O-pin (PORTF3)
@@ -213,9 +213,9 @@ void ADC_Service(void)
 *****************************************************************************/
 void ADC_periphery(void)
 {
-    int ADCresult = 0;
-    int ADCresult_temp = 0;
-    int Temp_int;
+    uint16_t ADCresult = 0;
+    uint16_t ADCresult_temp = 0;
+    uint16_t Temp_int;
     uint8_t Temp;
     uint8_t i = 0;
     char TL;

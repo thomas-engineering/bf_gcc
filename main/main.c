@@ -662,7 +662,7 @@ uint8_t Revision(uint8_t input)
 void OSCCAL_calibration(void)
 {
     uint8_t calibrate = FALSE;
-    int temp;
+    uint16_t temp;
     uint8_t tempL;
 
     SetClockPrescaler(CLOCK_1MHZ);

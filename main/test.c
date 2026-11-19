@@ -51,8 +51,8 @@ void Test(void)
     uint8_t i;
     uint8_t j;
     
-    int integer;
-    int temp_hi;
+    uint16_t integer;
+    uint16_t temp_hi;
     
     TIMSK2 = 0; // Stop clock, the interrupt will disturb the sound-test cause
                 // the play-routine doesn't use interrupt...

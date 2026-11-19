@@ -66,7 +66,7 @@ uint8_t CHAR2BCD2(uint8_t input)
 *****************************************************************************/
 uint16_t CHAR2BCD3(uint8_t input)
 {
-    int high = 0;
+    uint16_t high = 0;
         
     while (input >= 100)                // Count hundreds
     {
