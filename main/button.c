@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 //mtE
 #include "main.h"
 #include "button.h"
@@ -186,17 +187,16 @@ char getkey(void)
 {
     char k;
 
-    cli(); // mt: __disable_interrupt();
-
-    if (KEY_VALID)              // Check for unread key in buffer
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        k = KEY;
-        KEY_VALID = FALSE;
+        if (KEY_VALID)              // Check for unread key in buffer
+        {
+            k = KEY;
+            KEY_VALID = FALSE;
+        }
+        else
+            k = KEY_NULL;           // No key stroke available
     }
-    else
-        k = KEY_NULL;           // No key stroke available
-
-    sei(); // mt: __enable_interrupt();
 
     return k;
 }

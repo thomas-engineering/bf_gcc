@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 //mtE
 #include "main.h"
 #include "timer0.h"
@@ -196,25 +197,28 @@ char Timer0_AllocateCountdownTimer()
 
 void Timer0_SetCountdownTimer(char timer, char value)
 {
-    cli(); // mt __disable_interrupt();
-    CountDownTimers[timer-1] = value;
-    sei(); // mt __enable_interrupt();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        CountDownTimers[timer-1] = value;
+    }
 }
 
 char Timer0_GetCountdownTimer(char timer)
 {
     char t;
-    cli(); // mt __disable_interrupt();
-    t = CountDownTimers[timer-1];
-    sei(); // mt __enable_interrupt();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        t = CountDownTimers[timer-1];
+    }
     
     return t;
 }
 
 void Timer0_ReleaseCountdownTimer(char timer)
 {
-    cli(); // mt __disable_interrupt();
-    CountDownTimers[timer-1] = 255;
-    sei(); // mt __enable_interrupt();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        CountDownTimers[timer-1] = 255;
+    }
 }
 

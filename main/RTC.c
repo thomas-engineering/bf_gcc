@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include <avr/pgmspace.h>
 #include "button.h"
 //mtE
@@ -277,11 +278,12 @@ char SetClock(char input)
     else if (input == KEY_ENTER)
     {
         // store the temporary adjusted values to the global variables
-        cli(); // mt __disable_interrupt();
-        gHOUR = time[HOUR];
-        gMINUTE = time[MINUTE];
-        gSECOND = time[SECOND];
-        sei(); // mt __enable_interrupt();
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            gHOUR = time[HOUR];
+            gMINUTE = time[MINUTE];
+            gSECOND = time[SECOND];
+        }
         mode = HOUR;
         return ST_TIME_CLOCK_FUNC;
     }
@@ -544,11 +546,12 @@ char SetDate(char input)
     else if (input == KEY_ENTER)
     {
         // store the temporary adjusted values to the global variables
-        cli(); // mt __disable_interrupt();
-        gYEAR = date[YEAR];
-        gMONTH = date[MONTH];
-        gDAY = date[DAY];
-        sei(); // mt __enable_interrupt();
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            gYEAR = date[YEAR];
+            gMONTH = date[MONTH];
+            gDAY = date[DAY];
+        }
         mode = YEAR;
         return ST_TIME_DATE_FUNC;
     }

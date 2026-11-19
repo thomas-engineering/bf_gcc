@@ -27,6 +27,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 #include "main.h"
 #include "sound.h"
 #include "timer0.h"
@@ -429,22 +430,21 @@ void Play_Tune(void)
             else 
                 sbiBF(TCCR1B, CS10);             // start Timer1, prescaler(1)  
                 
-            cli(); // mt __disable_interrupt();
-            
-            // mt temp_hi = *(pSong + Tone);      // read out the PWM-value
-            // temp_hi = pgm_read_word(pSong + Tone);      // read out the PWM-value
-            temp_hi = temp_tone;   // mt 200301
-            temp_hi >>= 8;                  // move integer 8 bits to the rigth
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                // mt temp_hi = *(pSong + Tone);      // read out the PWM-value
+                // temp_hi = pgm_read_word(pSong + Tone);      // read out the PWM-value
+                temp_hi = temp_tone;   // mt 200301
+                temp_hi >>= 8;                  // move integer 8 bits to the rigth
                 
-            TCNT1H = 0;                     // reset TCNT1H/L
-            TCNT1L = 0;
+                TCNT1H = 0;                     // reset TCNT1H/L
+                TCNT1L = 0;
             
-            ICR1H = temp_hi;                // load ICR1H/L
-            // mt: ICR1L = *(pSong + Tone);        
-            // ICR1L = pgm_read_word(pSong + Tone);
-            ICR1L = temp_tone;
-            
-            sei(); // mt: __enable_interrupt();
+                ICR1H = temp_hi;                // load ICR1H/L
+                // mt: ICR1L = *(pSong + Tone);        
+                // ICR1L = pgm_read_word(pSong + Tone);
+                ICR1L = temp_tone;
+            }
             
             Tone++;                     // point to the next tone in the Song-table
         }
