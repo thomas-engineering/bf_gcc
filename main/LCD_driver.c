@@ -75,7 +75,6 @@ char gColon = 0;
 
 // Look-up table used when converting ASCII to
 // LCD display data (segment control)
-// mt __flash unsigned int LCD_character_table[] =
 const unsigned int LCD_character_table[] PROGMEM =
 {
     0x0A51,     // '*' (?)

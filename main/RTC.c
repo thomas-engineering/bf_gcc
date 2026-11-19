@@ -20,20 +20,17 @@
 //  20070129          SIGNAL->ISR                                   - mt
 //*****************************************************************************
 
-//mtA
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 #include <avr/pgmspace.h>
 #include "button.h"
-//mtE
 #include "main.h"
 #include "RTC.h"
 #include "LCD_functions.h"
 #include "BCD.h"
 
-// mtA
 //char gSECOND;
 //char gMINUTE;
 //char gHOUR;
@@ -50,7 +47,6 @@ volatile uint16_t gYEAR;
 //char dateformat = 0;
 volatile uint8_t gPowerSaveTimer = 0;
 uint8_t dateformat = 0;
-// mtE
 
 // Lookup table holding the length of each mont. The first element is a dummy.
 // mt this could be placed in progmem too, but the arrays are accessed quite
@@ -63,32 +59,26 @@ char TBL_CLOCK_12[] =   // table used when displaying 12H clock
 char clockformat = CLOCK_24;    // set initial clock format to 24H
 
 // different date formates (text only)
-// mtA
 //__flash char EUROPEAN_DATE_TEXT[] =   "DDMMYY";
 //__flash char AMERICAN_DATE_TEXT[] =   "MMDDYY";
 //__flash char CANADIAN_DATE_TEXT[] =   "YYMMDD"; 
 const char EUROPEAN_DATE_TEXT[] PROGMEM =   "DDMMYY";
 const char AMERICAN_DATE_TEXT[] PROGMEM =   "MMDDYY";
 const char CANADIAN_DATE_TEXT[] PROGMEM =   "YYMMDD"; 
-// mtE
 
 // different date formates, table for putting DD, MM and YY at the right place
 // on the LCD
-//mtA
 //__flash char EUROPEAN_DATE_NR[] =   { 4, 5, 2, 3, 0, 1 };
 //__flash char AMERICAN_DATE_NR[] =   { 4, 5, 0, 1, 2, 3 };
 //__flash char CANADIAN_DATE_NR[] =   { 0, 1, 2, 3, 4, 5 }; 
 const uint8_t EUROPEAN_DATE_NR[] PROGMEM =   { 4, 5, 2, 3, 0, 1 };
 const uint8_t AMERICAN_DATE_NR[] PROGMEM =   { 4, 5, 0, 1, 2, 3 };
 const uint8_t CANADIAN_DATE_NR[] PROGMEM =   { 0, 1, 2, 3, 4, 5 }; 
-//mtE
 
-//mtA
 //__flash char __flash *DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
 //__flash char __flash *DATE_FORMAT_NR[] = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
 PGM_P DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
 const uint8_t * const DATE_FORMAT_NR[] PROGMEM = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
-//mtE
 
 
 
@@ -207,14 +197,12 @@ char ShowClock(char input)
 char SetClock(char input)
 {
     static char enter_function = 1;
-    // mtA
     // static char time[3];    // table holding the temporary clock setting
     // static char mode = HOUR;
     // char HH, HL, MH, ML, SH, SL;
     static uint8_t time[3];
     static uint8_t mode = HOUR;
     uint8_t HH, HL, MH, ML, SH, SL;
-    // mtE
 
     if (enter_function)
     {
@@ -400,7 +388,6 @@ char ShowDate(char input)
     DL = (DH & 0x0F) + '0';
     DH = (DH >> 4) + '0';
 
-    // mtA
 	/*
     LCD_putc( *(DATE_FORMAT_NR[dateformat] + 0), YH);
     LCD_putc( *(DATE_FORMAT_NR[dateformat] + 1), YL);
@@ -416,7 +403,6 @@ char ShowDate(char input)
     LCD_putc( pgm_read_byte(pDateFormatNr++), ML);
 	LCD_putc( pgm_read_byte(pDateFormatNr++), DH);
     LCD_putc( pgm_read_byte(pDateFormatNr), DL);
-    // mtE
 
     LCD_putc(6, '\0');
 
@@ -452,7 +438,6 @@ char ShowDate(char input)
 char SetDate(char input)
 {
 	static char enter_function = 1;
-	// mtA
 	// static char date[3];    // table holding the temporary date setting
 	// static char mode = DAY;
 	// char YH, YL, MH, ML, DH, DL;
@@ -463,7 +448,6 @@ char SetDate(char input)
 	uint8_t YH, YL, MH, ML, DH, DL;
 	uint8_t MonthLength_temp;
 	uint8_t LeapMonth;
-	// mtE
 
     if (enter_function)
     {
@@ -655,12 +639,10 @@ char SetDateFormat(char input)
 *            The interrupt occurs once a second (running from the 32kHz crystal)
 *
 *******************************************************************************/
-// mtA
 // #pragma vector = TIMER2_OVF_vect
 // __interrupt void TIMER2_OVF_interrupt(void)
 // SIGNAL(SIG_OVERFLOW2)
 ISR(TIMER2_OVF_vect)
-// mtE
 {
     static char LeapMonth;
 

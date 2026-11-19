@@ -23,7 +23,6 @@
 //
 //***************************************************************************
 
-//mtA
 //#include <inavr.h>
 //#include "iom169.h"
 //#include "eeprom.h"
@@ -33,7 +32,6 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include "bfeeprom.h"
-//mtE
 #include "main.h"
 #include "button.h"
 #include "LCD_functions.h"
@@ -48,7 +46,6 @@ char gUART = FALSE;
 uint8_t indexps = 0;
 char Name[STRLENGHT];
 
-// mt __flash char TEXT_WAIT[]                     = "waiting for input on RS232";
 // mt: jw method used 
 /// const char TEXT_WAIT[] PROGMEM                = "waiting for input on RS232";
 
@@ -69,7 +66,6 @@ char vCard(char input)
 
 	if (enter)
 	{
-		// mt __EEGET(indexps, EEPROM_START);           // Load the length if the name
 		indexps=eeprom_read_byte(EEPROM_START);
 
 		if((indexps < 1) || (indexps > STRLENGHT))   // if illegal length / mt: fixed, was: |    
@@ -117,7 +113,6 @@ char vCard(char input)
 *   mthomas: I have modified this function a little and did not keep the 
 *            original code.
 *****************************************************************************/
-//mtA
 char EnterName(char input)
 {
 	static char enter = 1;
@@ -219,7 +214,6 @@ char EnterName(char input)
 		indexps++;
 		Name[indexps] = '\0';
 
-		// mt __EEPUT(EEPROM_START, indexps);   //store the length of name in EEPROM
 		eeprom_update_byte(EEPROM_START, indexps);
 		StoreEEPROM(Name, indexps, EEPROM_START + 1);  //store the Name in EEPROM
 
@@ -229,7 +223,6 @@ char EnterName(char input)
 
 	return ST_VCARD_ENTER_NAME_FUNC;
 }
-//mtE
 
 
 /*****************************************************************************
@@ -285,7 +278,6 @@ char RS232(char input)
                 
                 enter = 1;
                         
-                // mt __EEPUT(EEPROM_START, temp_index);   //store the length of name in EEPROM
                 eeprom_update_byte(EEPROM_START, temp_index);
                 StoreEEPROM(Name, temp_index, EEPROM_START + 1);  //store the Name in EEPROM
                 

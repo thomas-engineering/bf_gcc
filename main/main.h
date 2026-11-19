@@ -46,13 +46,11 @@ static inline void SetClockPrescaler(uint8_t clkps)
 #define AUTO    3
 
 // Macro definitions
-//mtA - 
 // sbi and cbi are not longer supported by the avr-libc
 // to avoid version-conflicts the macro-names have been 
 // changed to sbiBF/cbiBF "everywhere"
 #define sbiBF(port,bit)  (port |= (1<<bit))   //set bit in port
 #define cbiBF(port,bit)  (port &= ~(1<<bit))  //clear bit in port
-//mtE
 
 // Menu state machine states
 #define ST_AVRBF                        10

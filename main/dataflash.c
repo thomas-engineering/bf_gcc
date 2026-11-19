@@ -45,13 +45,11 @@
 */
 
 // Includes
-//mtA
 //#include <INA90.H>
 //#include "iom169.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-//mtE
 
 #include "dataflash.h"
 
@@ -83,12 +81,10 @@ unsigned int  PageSize = 0;
 ******************************************************************************/
 void DF_SPI_init (void)
 {
-	// mtA
 	// PORTB |= (1<<PORTB3) | (1<<PORTB2) | (1<<PORTB1) | (1<<PORTB0);
 	// DDRB |= (1<<PORTB2) | (1<<PORTB1) | (1<<PORTB0);		//Set MOSI, SCK AND SS as outputs
 	PORTB |= (1<<PB3) | (1<<PB2) | (1<<PB1) | (1<<PB0);
 	DDRB |= (1<<DDB2) | (1<<DDB1) | (1<<DDB0);		//Set MOSI, SCK AND SS as outputs
-	// mtE
 	SPSR = (1<<SPI2X);                                      //SPI double speed settings
 	SPCR = (1<<SPE) | (1<<MSTR) | (1<<CPHA) | (1<<CPOL);	//Enable SPI in Master mode, mode 3, Fosc/4
 // mt: the following line was already commented out in the original code
@@ -146,14 +142,12 @@ unsigned char Read_DF_status (void)
 	result = DF_SPI_RW(0x00);				//dummy write to get result
 	
 	index_copy = ((result & 0x38) >> 3);	//get the size info from status register
-	// mtA
 	/// if (!PageBits) { // mt 200401
 		// PageBits   = DF_pagebits[index_copy];	//get number of internal page address bits from look-up table
 		// PageSize   = DF_pagesize[index_copy];   //get the size of the page (in bytes)
 		PageBits   = pgm_read_byte(&DF_pagebits[index_copy]);	//get number of internal page address bits from look-up table
 		PageSize   = pgm_read_word(&DF_pagesize[index_copy]);   //get the size of the page (in bytes)
 	/// }
-	// mtE
 	return result;							//return the read status register value
 }
 
@@ -306,10 +300,8 @@ void Buffer_Read_Str (unsigned char BufferNo, unsigned int IntPageAdr, unsigned 
 #endif
 }
 //NB : Sjekk at (IntAdr + No_of_bytes) < buffersize, hvis ikke blir det bare ball..
-//mtA 
 // translation of the Norwegian comments (thanks to Eirik Tveiten):
 // NB : Check that (IntAdr + No_of_bytes) < buffersize, if not there will be problems
-//mtE
 
 
 /*****************************************************************************
@@ -451,11 +443,9 @@ void Buffer_Write_Str (unsigned char BufferNo, unsigned int IntPageAdr, unsigned
 }
 //NB : Monitorer busy-flag i status-reg.
 //NB : Sjekk at (IntAdr + No_of_bytes) < buffersize, hvis ikke blir det bare ball..
-//mtA 
 // translation of the Norwegian comments (thanks to Eirik Tveiten):
 // NB : Monitors busy-flag in status-reg
 // NB : Check that (IntAdr + No_of_bytes) < buffersize, if not there will be problems
-//mtE
 
 /*****************************************************************************
 *

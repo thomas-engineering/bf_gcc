@@ -19,14 +19,12 @@
 //
 //***************************************************************************
 
-//mtA
 //#include <inavr.h>
 //#include "iom169.h"
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include "pgmspacehlp.h"
 #include "button.h"
-//mtE
 
 #include "main.h"
 #include "ADC.h"
@@ -34,7 +32,6 @@
 #include "LCD_functions.h"
 #include "timer0.h"
 
-// mt __flash int TEMP_Celcius_pos[] =    // Positive Celcius temperatures (ADC-value)
 const int TEMP_Celsius_pos[] PROGMEM =    // Positive Celsius temperatures (ADC-value)
         {                           // from 0 to 60 degrees
             806,796,786,775,765,754,743,732,720,709,697,685,673,661,649,
@@ -44,13 +41,11 @@ const int TEMP_Celsius_pos[] PROGMEM =    // Positive Celsius temperatures (ADC-
             187,
         };
 
-// mt __flash int TEMP_Celcius_neg[] =    // Negative Celcius temperatures (ADC-value)
 const int TEMP_Celsius_neg[] PROGMEM =    // Negative Celsius temperatures (ADC-value)
         {                           // from -1 to -15 degrees
             815,825,834,843,851,860,868,876,883,891,898,904,911,917,923,
         };
 
-// mt __flash int TEMP_Farenheit_pos[] =  // Positive Farenheit temperatures (ADC-value)
 const int TEMP_Fahrenheit_pos[] PROGMEM =  // Positive Fahrenheit temperatures (ADC-value)
 		{                           // from 0 to 140 degrees
 			938, 935, 932, 929, 926, 923, 920, 916, 913, 909, 906, 902, 898, 
@@ -67,14 +62,12 @@ const int TEMP_Fahrenheit_pos[] PROGMEM =  // Positive Fahrenheit temperatures (
 		};
 
         
-// mt __flash int LIGHT_ADC[] = // Table used to find the Vref, when using the voltage-reading function 
 const int LIGHT_ADC[] PROGMEM = // Table used to find the Vref, when using the voltage-reading function 
         { 
             0x35,0x60,0x80,0x0B0,0x11D,0x13D,0x15A,0x17A,0x197,0x1B9,0x1DA,
             0x1F9,0x216,0x240,0x26D,0x282,0x2A2,0x2EF,0x332,0x3B0,0x3F2
         };
         
-//mt __flash float LIGHT_VOLTAGE[] = // Vref table correspondent to the LIGHT_ADC[] table
 const float LIGHT_VOLTAGE[] PROGMEM = // Vref table correspondent to the LIGHT_ADC[] table
         {
             2.818,2.820,2.824,2.827,2.832,2.835,2.839,2.841,2.843,2.847,2.850,

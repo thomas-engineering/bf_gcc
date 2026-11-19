@@ -18,7 +18,6 @@
 //*****************************************************************************
 
 
-//mtA
 //extern char gSECOND;
 //extern char gMINUTE;
 //extern char gHOUR;
@@ -32,7 +31,6 @@ extern volatile uint8_t  gMONTH;
 extern volatile uint16_t gYEAR;
 
 extern volatile uint8_t  gPowerSaveTimer;
-//mtE
 
 //  Function declarations
 void RTC_init(void);            //initialize the Timer Counter 2 in asynchron operation

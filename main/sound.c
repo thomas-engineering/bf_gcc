@@ -47,7 +47,6 @@
 *
 ******************************************************************************/
 
-// mt __flash char TEXT_SONG1[]       = "Fur Elise";
 const char TEXT_SONG1[] PROGMEM      = "Fur Elise";
 
 // __flash int FurElise[] =   
@@ -166,10 +165,8 @@ const int Exorcist[] PROGMEM =
         };
 
 // pointer-array with pointers to the song arrays
-// mt: __flash int __flash *Songs[]    = { FurElise, Mozart, /*Minuet, AuldLangSyne,*/ Sirene1, Sirene2, Whistle, 0};
 const int * const Songs[] PROGMEM   = { FurElise, Mozart, Minuet, AuldLangSyne, Sirene1, Sirene2, Whistle, Exorcist, 0 };
 
-//mt: __flash char __flash *TEXT_SONG_TBL[]    = { TEXT_SONG1, TEXT_SONG2, /*TEXT_SONG3, TEXT_SONG4,*/TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, 0};
 PGM_P const TEXT_SONG_TBL[] PROGMEM   = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, TEXT_SONG8, 0 };
 // const char *TEXT_SONG_TBL[]    = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, 0};
 
@@ -479,7 +476,6 @@ void Play_Tune(void)
  
 }    
 
-//mtA
 /*****************************************************************************
 *
 *   Function name : PlayClick
@@ -501,4 +497,3 @@ void PlayClick(void)
 		Delay(1);
 	}
 }
-//mtE

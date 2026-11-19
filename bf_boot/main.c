@@ -41,7 +41,6 @@
 
 // mt redundant: #define ENABLE_BIT_DEFINITIONS
 
-//mtA
 // #include <inavr.h>
 // #include "iom169.h"
 // #include "assembly.h"
@@ -51,7 +50,6 @@
 
 // Enable functions originaly disabled
 // #define ENABLEREADFUSELOCK // keep this disabled until AVRPROG supports ATmega169
-//mtE
 
 // ATmega169 is not suppored by AVRPROG V1.37, so "mimic" an ATmega16 instead
 // AVRProg 1.40 supports an ATmega169 device-type
@@ -140,7 +138,6 @@ int main(void)
         {
             UCSRA = 0x02;
             SMCR = (3<<SM0) | (1<<SE);      // Enable Power-save mode
-			// mt __sleep();  // Go to sleep
             asm volatile ("sleep"::);		 // Go to sleep
 			
             SMCR = 0;                       // Just woke, disable sleep
@@ -462,11 +459,9 @@ char recchar(void)
 }
 
 
-// mtA
 // #pragma vector = PCINT1_vect
 // __interrupt void PCINT1_interrupt(void)
 // mt TODO: find out if the handler is needed
-// mtE
 // SIGNAL(SIG_PIN_CHANGE1)
 ISR(PCINT1_vect)
 {

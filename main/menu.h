@@ -1,6 +1,5 @@
 // menu.h
 
-// mt __flash typedef struct
 typedef struct PROGMEM
 {
     unsigned char state;
@@ -9,7 +8,6 @@ typedef struct PROGMEM
 } MENU_NEXTSTATE;
 
 
-// mt __flash typedef struct
 typedef struct PROGMEM
 {
     unsigned char state;
@@ -47,7 +45,6 @@ const char MT_OPTIONS_BOOT[] PROGMEM              = "Bootloader";
 const char MT_OPTIONS_POWER_SAVE[] PROGMEM        = "Power Save Mode";
 const char MT_OPTIONS_AUTO_POWER_SAVE[] PROGMEM   = "Auto Power Save";
 const char MT_OPTIONS_KEYCLICK[] PROGMEM          = "Key Click";
-// mtE
 
 // mt MENU_NEXTSTATE menu_nextstate[] = { 
 const MENU_NEXTSTATE menu_nextstate[] PROGMEM = {

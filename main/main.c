@@ -37,7 +37,6 @@
 // "// mtE" but forgot this for some changes esp. during debugging. 'diff' 
 // against the original code to see everything that has been changed.
 
-//mtA
 //#include <inavr.h>
 //#include "iom169.h"
 #include <stdint.h>
@@ -52,7 +51,6 @@
 #warning "avr-libc >= version 1.4.5 recommended"
 #warning "This code has not been tested with older versions."
 #endif
-//mtE
 
 #include "main.h"
 #include "LCD_functions.h"
@@ -94,7 +92,6 @@ unsigned char state;  // holds the current state, according to "menu.h"
 *   Purpose :       Contains the main loop of the program
 *
 *****************************************************************************/
-// mt __C_task void main(void)
 int main(void)
 {    
 //  unsigned char state, nextstate;
@@ -155,7 +152,6 @@ int main(void)
                     //mt 1/06 if (pgm_read_byte(&menu_state[i].state) == state)
                     if (j == state)
                     {
-                        // mtA
                         // mt - original: statetext =  menu_state[i].pText;
                         // mt - original: pStateFunc = menu_state[i].pFunc;
                         /// mt this is like the example from an avr-gcc guru (mailing-list):
@@ -163,7 +159,6 @@ int main(void)
                         // mt - store pointer to function from menu_state[i].pFunc in pStateFunc
                         //// pStateFunc = pmttemp;	// oh je - wie soll ich das jemals debuggen - ?
                         pStateFunc = (PGM_VOID_P) pgm_read_word(&menu_state[i].pFunc);
-                        // mtE
                         break;
                     }
                 }
@@ -185,12 +180,10 @@ int main(void)
         
         // If the joystick is held in the UP and DOWN position at the same time,
         // activate test-mode
-        // mtA
         // if( !(PINB & (1<<PORTB7)) && !(PINB & (1<<PORTB6)) )    
         if( !(PINB & (1<<PINB7)) && !(PINB & (1<<PINB6)) ) {
             Test();
         }
-        // mtE
         
         // Check if the joystick has been in the same position for some time, 
         // then activate auto press of the joystick
@@ -221,14 +214,12 @@ int main(void)
             if(PowerSave)
                 cbiBF(LCDCRA, 7);             // disable LCD
 
-            // mtA
             // "Manual" Power-Save sleep - replaced by avr-libc functions
             // SMCR = (3<<SM0) | (1<<SE);   // Enable Power-save mode
             // asm volatile ("sleep"::);    // __sleep();  // Go to sleep
             // mt 20070131 - avr-libc 1.4.x supports ATmega169 sleep
             set_sleep_mode(SLEEP_MODE_PWR_SAVE);
             sleep_mode();
-            // mtE
 
             if(PowerSave)
             {
@@ -248,17 +239,14 @@ int main(void)
         }
         else
         {
-           // mtA
            // "Manual" Power-Save sleep - replaced by avr-libc functions
            // SMCR = (1<<SE);            // Enable idle mode
            // asm volatile ("sleep"::);  // __sleep();  // Go to sleep
            // mt 20070131 - avr-libc 1.4.x supports ATmega169 sleep
            set_sleep_mode(SLEEP_MODE_IDLE);
            sleep_mode();
-           // mtE
         }
 
-        // mtA
         // SMCR-reset is not needed since (from avr-libc Manual): 
         // This [the sleep_mode] macro automatically takes care to 
         // enable the sleep mode in the CPU before going to sleep, 
@@ -379,7 +367,6 @@ void Initialization(void)
 *                   Bootloader-section. (the BOOTRST-fuse must be programmed)
 *
 *****************************************************************************/
-// mt __flash char TEXT_BOOT[]                     
 // mt - as in jw-patch: const char TEXT_BOOT[] PROGMEM	= "Jump to bootloader";
 
 char BootFunc(char input)
@@ -422,7 +409,6 @@ char BootFunc(char input)
 *   Purpose :       Enable power save
 *
 *****************************************************************************/
-// mt __flash char TEXT_POWER[]                     = "Press enter to sleep";
 // mt jw const char TEXT_POWER[]  PROGMEM  = "Press enter to sleep";
 
 char PowerSaveFunc(char input)
@@ -639,13 +625,11 @@ char Revision(char input)
         LCD_putc(0, 'R');
         LCD_putc(1, 'E');
         LCD_putc(2, 'V');
-        // mtA 
         // LCD_putc(3, ' ');
         LCD_putc(3, (SWHIGH + 0x30)); // LCD_putc(4, (SWHIGH + 0x30));       //SWHIGH/LOW are defined in "main.h"
         LCD_putc(4, (SWLOW + 0x30)); // LCD_putc(5, (SWLOW + 0x30));
         LCD_putc(5, (SWLOWLOW + 0x30)); // LCD_putc(5, (SWLOW + 0x30));
         LCD_putc(6, '\0');
-        // mtE
         
         LCD_UpdateRequired(TRUE, 0);          
     }
@@ -742,7 +726,6 @@ void OSCCAL_calibration(void)
     }
 }
 
-// mtA
 #if 0
 /*****************************************************************************
 *
