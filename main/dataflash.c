@@ -56,10 +56,10 @@
 // Constants
 //Look-up table for these sizes ->  512k, 1M, 2M, 4M, 8M, 16M, 32M, 64M
 // mt flash uint8_t DF_pagebits[]  ={  9,  9,  9,  9,  9,  10,  10,  11};	    //index of internal page address bits
-const uint8_t DF_pagebits[] PROGMEM ={  9,  9,  9,  9,  9,  10,  10,  11};	    //index of internal page address bits
+const __flash uint8_t DF_pagebits[] ={  9,  9,  9,  9,  9,  10,  10,  11};	    //index of internal page address bits
 //Look-up table for these sizes ->  512k, 1M,  2M,  4M,  8M, 16M, 32M, 64M
 // mt flash uint16_t  DF_pagesize[]  ={264,264, 264, 264, 264, 528, 528,1056};	//index of pagesizes
-const uint16_t DF_pagesize[] PROGMEM ={264,264, 264, 264, 264, 528, 528,1056};	//index of pagesizes
+const __flash uint16_t DF_pagesize[] ={264,264, 264, 264, 264, 528, 528,1056};	//index of pagesizes
 
 
 // Globals
@@ -145,8 +145,8 @@ uint8_t Read_DF_status (void)
 	/// if (!PageBits) { // mt 200401
 		// PageBits   = DF_pagebits[index_copy];	//get number of internal page address bits from look-up table
 		// PageSize   = DF_pagesize[index_copy];   //get the size of the page (in bytes)
-		PageBits   = pgm_read_byte(&DF_pagebits[index_copy]);	//get number of internal page address bits from look-up table
-		PageSize   = pgm_read_word(&DF_pagesize[index_copy]);   //get the size of the page (in bytes)
+		PageBits   = DF_pagebits[index_copy];	//get number of internal page address bits from look-up table
+		PageSize   = DF_pagesize[index_copy];   //get the size of the page (in bytes)
 	/// }
 	return result;							//return the read status register value
 }
