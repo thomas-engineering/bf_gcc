@@ -29,6 +29,18 @@ on the erase command sent by the programmer. With "-D" alone nothing is
 erased, and the verify fails. Example:
 avrdude -c butterfly -p atmega169 -P /dev/ttyUSB0 -b 19200 -e -D -U flash:w:build/main.hex:i
 
+(Remark from Claude, later the same day:)
+Source cleanup, tested on the board so far: ATOMIC_BLOCK instead of cli()/sei(),
+SetClockPrescaler(), eeprom_update_byte, no -fpack-struct/-fshort-enums
+(identical hex), "// mtA" / "// mtE" markers and the commented IAR originals
+removed (so 'diff' against the original code is noisier now).
+Not tested on the board yet: __flash tables, _delay_ms() in Delay(), atomic
+reads of time and date, calendar.h (fixes the day limit in "Adjust Date"),
+board.h, bool/stdint types, and in the bootloader: page erase in BufferLoad
+(then "-D" alone works, flash it through ISP first), idle timeout by watchdog
+in programming mode, no jump to an erased application.
+Host unit tests: "make -C tests".
+
 18. Nov. 2026
 
 Tested with avr-gcc 7.3.0, avr-libc 2.0.0 (Arduino package)
