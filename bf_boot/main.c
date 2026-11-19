@@ -46,6 +46,8 @@
 // #include "assembly.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <avr/wdt.h>
 #include <lowlevel.h>
 
 // Enable functions originaly disabled
@@ -74,6 +76,23 @@ unsigned char BufferLoad(unsigned int , unsigned char ) ;
 void BlockRead(unsigned int , unsigned char ) ;
 void OSCCAL_calibration(void) ;
 void Delay(unsigned int) ;
+
+// Runs before main(): after the watchdog reset caused by the 'E' command the
+// watchdog is still enabled and WDRF is set, so switch it off first.
+void wdt_off_at_startup(void) __attribute__((naked, used, section(".init3")));
+void wdt_off_at_startup(void)
+{
+    MCUSR = 0;
+    wdt_disable();
+}
+
+// A flash that is still erased (reset vector 0xFFFF) holds no application.
+#define APPLICATION_PRESENT()   (pgm_read_word(0x0000) != 0xFFFF)
+
+// In programming mode the watchdog resets the board when the programmer
+// stays silent for this long (the bootloader would otherwise wait forever
+// and drain the battery).
+#define IDLE_TIMEOUT    WDTO_2S
 
 unsigned int address;
 unsigned char device;
@@ -127,7 +146,7 @@ int main(void)
 
 	for(;OK;)
 	{
-		if(!(PINB & (1<<PINB6)))	// mt if(!(PINB & (1<<PORTB6)))
+		if(!(PINB & (1<<PINB6)) && APPLICATION_PRESENT())	// joystick up and an application is programmed
         {   // joystick "up" detected
             MCUCR = (1<<IVCE); 
             MCUCR = (0<<IVSEL);             //move interruptvectors to the Application sector
@@ -161,6 +180,7 @@ int main(void)
                 sendchar('T');
                 
                 cli(); 	// mt __disable_interrupt();
+                wdt_enable(IDLE_TIMEOUT);   // see IDLE_TIMEOUT
                 
                 OK = 0;
             }
@@ -171,6 +191,7 @@ int main(void)
 
       for(;;)                               // If PINDX is pulled low: programmingmode. (mt: here PINB4)
       {
+        wdt_reset();                        // programmer is still talking to us
         val=recchar();
          
         if(val=='a')                        //Autoincrement?
@@ -235,6 +256,7 @@ int main(void)
           {
             for(address=0;address < APP_END;address += PAGESIZE)    //Application section = 60 pages
             {
+                wdt_reset();
                 write_page(address,(1<<PGERS) + (1<<SPMEN));    //Perform page erase
                 write_page(address,(1<<RWWSRE) + (1<<SPMEN));   //Re-enable the RWW section
             }
@@ -245,8 +267,10 @@ int main(void)
 
         else if(val=='E')                   //Exit upgrade
         {
-		  WDTCR = (1<<WDCE) | (1<<WDE);     //Enable Watchdog Timer to give reset
 		  sendchar('\r');
+		  wdt_enable(WDTO_15MS);            // let the watchdog reset the board
+		  for (;;)
+		      ;
         }
 /*
         else if(val=='l')                   // write lockbits 
