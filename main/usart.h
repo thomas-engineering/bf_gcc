@@ -1,3 +1,4 @@
+#include <stdint.h>
 #ifndef UART_H_
 #define UART_H_
 
@@ -5,7 +6,7 @@
 // the transmitter:
 // #define WITH_TRANSMIT
 
-void USART_Init(unsigned int baudrate);
+void USART_Init(uint16_t baudrate);
 char Usart_Rx(void);
 #ifdef WITH_TRANSMIT
 void Usart_Tx(char);

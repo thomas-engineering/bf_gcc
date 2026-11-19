@@ -78,7 +78,7 @@ volatile BOOL gKeyClickStatus  = FALSE;  // Variable to enable/disable keyclick
 
 char PowerSave = FALSE;
 
-unsigned char state;  // holds the current state, according to "menu.h"
+uint8_t state;  // holds the current state, according to "menu.h"
 
 
 /*****************************************************************************
@@ -94,8 +94,8 @@ unsigned char state;  // holds the current state, according to "menu.h"
 *****************************************************************************/
 int main(void)
 {    
-//  unsigned char state, nextstate;
-    unsigned char nextstate;
+//  uint8_t state, nextstate;
+    uint8_t nextstate;
     // mt static char __flash *statetext;
     PGM_P statetext;
     char (*pStateFunc)(char);
@@ -272,10 +272,10 @@ int main(void)
 *   Purpose :       Shifts between the different states
 *
 *****************************************************************************/
-unsigned char StateMachine(char cur_state, unsigned char stimuli)
+uint8_t StateMachine(char cur_state, uint8_t stimuli)
 {
-    unsigned char nextstate = cur_state;    // Default stay in same state
-    unsigned char i, j;
+    uint8_t nextstate = cur_state;    // Default stay in same state
+    uint8_t i, j;
 
     // mt: for (i=0; menu_nextstate[i].state; i++)
     for (i=0; ( j=pgm_read_byte(&menu_nextstate[i].state) ); i++ )
@@ -584,12 +584,12 @@ char KeyClick(char input)
 *
 *   Returns :       None
 *
-*   Parameters :    unsigned int millisec
+*   Parameters :    uint16_t millisec
 *
 *   Purpose :       Delay-loop
 *
 *****************************************************************************/
-void Delay(unsigned int millisec)
+void Delay(uint16_t millisec)
 {
 	// mt, int i did not work in the simulator:  int i; 
 	uint8_t i;
@@ -659,9 +659,9 @@ char Revision(char input)
 *****************************************************************************/
 void OSCCAL_calibration(void)
 {
-    unsigned char calibrate = FALSE;
+    uint8_t calibrate = FALSE;
     int temp;
-    unsigned char tempL;
+    uint8_t tempL;
 
     SetClockPrescaler(CLOCK_1MHZ);
 

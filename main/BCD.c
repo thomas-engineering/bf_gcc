@@ -1,3 +1,4 @@
+#include <stdint.h>
 //***************************************************************************
 //
 //  File........: BCD.c
@@ -62,7 +63,7 @@ char CHAR2BCD2(char input)
 *                   contain the ones, tens and hundreds of the input.
 *
 *****************************************************************************/
-unsigned int CHAR2BCD3(char input)
+uint16_t CHAR2BCD3(char input)
 {
     int high = 0;
         

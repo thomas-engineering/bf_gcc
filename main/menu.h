@@ -1,16 +1,17 @@
+#include <stdint.h>
 // menu.h
 
 typedef struct PROGMEM
 {
-    unsigned char state;
-    unsigned char input;
-    unsigned char nextstate;
+    uint8_t state;
+    uint8_t input;
+    uint8_t nextstate;
 } MENU_NEXTSTATE;
 
 
 typedef struct PROGMEM
 {
-    unsigned char state;
+    uint8_t state;
     // char __flash *pText;
     PGM_P pText;
     char (*pFunc)(char input);

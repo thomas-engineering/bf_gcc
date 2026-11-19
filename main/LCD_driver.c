@@ -68,7 +68,7 @@ char gColon = 0;
 
 // Look-up table used when converting ASCII to
 // LCD display data (segment control)
-const unsigned int LCD_character_table[] PROGMEM =
+const uint16_t LCD_character_table[] PROGMEM =
 {
     0x0A51,     // '*' (?)
     0x2A80,     // '+'
@@ -187,7 +187,7 @@ void LCD_Init(void)
 void LCD_WriteDigit(char c, char digit)
 {
 
-    unsigned int seg = 0x0000;                  // Holds the segment pattern
+    uint16_t seg = 0x0000;                  // Holds the segment pattern
     char mask, nibble;
     volatile char *ptr;
     char i;
@@ -206,7 +206,7 @@ void LCD_WriteDigit(char c, char digit)
         c -= '*';
 
         //mt seg = LCD_character_table[c];
-        seg = (unsigned int) pgm_read_word(&LCD_character_table[(uint8_t)c]); 
+        seg = (uint16_t) pgm_read_word(&LCD_character_table[(uint8_t)c]); 
     }
 
     // Adjust mask according to LCD segment mapping
@@ -232,7 +232,7 @@ void LCD_WriteDigit(char c, char digit)
 
 /*****************************************************************************
 *
-*   Function name : LCD_AllSegments(unsigned char input)
+*   Function name : LCD_AllSegments(uint8_t input)
 *
 *   Returns :       None
 *
@@ -243,7 +243,7 @@ void LCD_WriteDigit(char c, char digit)
 *****************************************************************************/
 void LCD_AllSegments(char show)
 {
-    unsigned char i;
+    uint8_t i;
 
     if (show)
         show = 0xFF;
@@ -274,7 +274,7 @@ ISR(LCD_vect)
     char flash;
 
     char EOL;
-    unsigned char i;
+    uint8_t i;
 
     static char timeout_count;
     static char auto_joystick_count;

@@ -1,3 +1,4 @@
+#include <stdint.h>
 //*****************************************************************************
 //
 //      COPYRIGHT (c) ATMEL Norway, 1996-2001
@@ -77,19 +78,19 @@
 
 //Function definitions
 void DF_SPI_init (void);
-unsigned char DF_SPI_RW (unsigned char output);
-unsigned char Read_DF_status (void);
-void Page_To_Buffer (unsigned int PageAdr, unsigned char BufferNo);
-unsigned char Buffer_Read_Byte (unsigned char BufferNo, unsigned int IntPageAdr);
-void Buffer_Read_Str (unsigned char BufferNo, unsigned int IntPageAdr, unsigned int No_of_bytes, unsigned char *BufferPtr);
-void Buffer_Write_Enable (unsigned char BufferNo, unsigned int IntPageAdr);
-void Buffer_Write_Byte (unsigned char BufferNo, unsigned int IntPageAdr, unsigned char Data);
-void Buffer_Write_Str (unsigned char BufferNo, unsigned int IntPageAdr, unsigned int No_of_bytes, unsigned char *BufferPtr);
-void Buffer_To_Page (unsigned char BufferNo, unsigned int PageAdr);
-void Cont_Flash_Read_Enable (unsigned int PageAdr, unsigned int IntPageAdr);
+uint8_t DF_SPI_RW (uint8_t output);
+uint8_t Read_DF_status (void);
+void Page_To_Buffer (uint16_t PageAdr, uint8_t BufferNo);
+uint8_t Buffer_Read_Byte (uint8_t BufferNo, uint16_t IntPageAdr);
+void Buffer_Read_Str (uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr);
+void Buffer_Write_Enable (uint8_t BufferNo, uint16_t IntPageAdr);
+void Buffer_Write_Byte (uint8_t BufferNo, uint16_t IntPageAdr, uint8_t Data);
+void Buffer_Write_Str (uint8_t BufferNo, uint16_t IntPageAdr, uint16_t No_of_bytes, uint8_t *BufferPtr);
+void Buffer_To_Page (uint8_t BufferNo, uint16_t PageAdr);
+void Cont_Flash_Read_Enable (uint16_t PageAdr, uint16_t IntPageAdr);
 #ifdef MTEXTRAS
-void Page_Erase (unsigned int PageAdr); // added by mthomas
-unsigned char Page_Buffer_Compare(unsigned char BufferNo, unsigned int PageAdr); // added by mthomas
+void Page_Erase (uint16_t PageAdr); // added by mthomas
+uint8_t Page_Buffer_Compare(uint8_t BufferNo, uint16_t PageAdr); // added by mthomas
 #endif
 
 #endif

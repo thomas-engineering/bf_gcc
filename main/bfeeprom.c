@@ -1,3 +1,4 @@
+#include <stdint.h>
 //***************************************************************************
 //
 //  File........: eeprom.c
@@ -34,9 +35,9 @@
 *   Purpose :       Write byte(s) to the EEPROM
 *
 *****************************************************************************/
-void StoreEEPROM(char *pBuffer, char num_bytes, unsigned char* EE_START_ADR)
+void StoreEEPROM(char *pBuffer, char num_bytes, uint8_t* EE_START_ADR)
 {
-    unsigned char i;
+    uint8_t i;
     for (i=0;i<num_bytes;i++) {
         eeprom_update_byte(EE_START_ADR, pBuffer[i]);
         EE_START_ADR++;
@@ -56,9 +57,9 @@ void StoreEEPROM(char *pBuffer, char num_bytes, unsigned char* EE_START_ADR)
 *
 *****************************************************************************/
 
-void LoadEEPROM(char *pBuffer, char num_bytes, unsigned char* EE_START_ADR)
+void LoadEEPROM(char *pBuffer, char num_bytes, uint8_t* EE_START_ADR)
 {
-    unsigned char i;
+    uint8_t i;
     for (i=0;i<num_bytes;i++) {
         pBuffer[i]=eeprom_read_byte(EE_START_ADR);
         EE_START_ADR++;

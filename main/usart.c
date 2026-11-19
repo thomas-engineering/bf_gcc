@@ -1,3 +1,4 @@
+#include <stdint.h>
 //***************************************************************************
 //
 //  File........: usart.c
@@ -32,16 +33,16 @@
 *
 *   Returns :       None
 *
-*   Parameters :    unsigned int baudrate
+*   Parameters :    uint16_t baudrate
 *
 *   Purpose :       Initialize the USART
 *
 *****************************************************************************/
-void USART_Init(unsigned int baudrate)
+void USART_Init(uint16_t baudrate)
 {
     // Set baud rate
-    UBRRH = (unsigned char)(baudrate>>8);
-    UBRRL = (unsigned char)baudrate;
+    UBRRH = (uint8_t)(baudrate>>8);
+    UBRRL = (uint8_t)baudrate;
 
     // Enable 2x speed
     UCSRA = (1<<U2X);

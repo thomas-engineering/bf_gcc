@@ -1,3 +1,4 @@
+#include <stdint.h>
 // Button.h
 
 #ifdef M162
@@ -36,5 +37,5 @@ void Button_Init(void);
 char getkey(void);
 char ButtonBouncing(void);
 
-extern volatile unsigned char gButtonTimeout;   // set in LCD_SOF_interrupt (LCD_driver.c)
+extern volatile uint8_t gButtonTimeout;   // set in LCD_SOF_interrupt (LCD_driver.c)
 

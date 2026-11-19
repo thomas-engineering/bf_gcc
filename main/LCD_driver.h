@@ -1,3 +1,4 @@
+#include <stdint.h>
 //*****************************************************************************
 //
 //  File........: LCD_Driver.h
@@ -40,7 +41,7 @@
 #define LCD_SET_COLON(active) LCD_Data[8] = active
 
 // DEVICE SPECIFIC!!! (ATmega169)
-#define pLCDREG ((unsigned char *)(0xEC))
+#define pLCDREG ((uint8_t *)(0xEC))
 
 // DEVICE SPECIFIC!!! (ATmega169) First LCD segment register
 #define LCD_CONTRAST_LEVEL(level) LCDCCR=((LCDCCR&0xF0)|(0x0F & level))

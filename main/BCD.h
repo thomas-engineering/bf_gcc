@@ -1,3 +1,4 @@
+#include <stdint.h>
 //***************************************************************************
 //
 //  File........: BCD.h
@@ -20,4 +21,4 @@
 
 // Function declarations
 char CHAR2BCD2(char input);
-unsigned int CHAR2BCD3(char input);
+uint16_t CHAR2BCD3(char input);

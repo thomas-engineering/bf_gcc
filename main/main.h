@@ -7,12 +7,12 @@
 // main.h
 
 void Initialization(void);
-unsigned char StateMachine(char state, unsigned char stimuli);
+uint8_t StateMachine(char state, uint8_t stimuli);
 char BootFunc(char input);
 char PowerSaveFunc(char input);
 char AutoPower(char input);
 char KeyClick(char input);
-void Delay(unsigned int millisec);
+void Delay(uint16_t millisec);
 char Revision(char input);
 void OSCCAL_calibration(void);
 

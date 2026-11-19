@@ -34,8 +34,8 @@
 // for gPowerSaveTimer:
 #include "RTC.h"
 
-// mt  unsigned char gButtonTimeout = FALSE;
-volatile unsigned char gButtonTimeout = FALSE;
+// mt  uint8_t gButtonTimeout = FALSE;
+volatile uint8_t gButtonTimeout = FALSE;
 
 //char KEY = NULL;
 //char KEY_VALID = FALSE;

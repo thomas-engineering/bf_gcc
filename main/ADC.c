@@ -1,3 +1,4 @@
+#include <stdint.h>
 //***************************************************************************
 //
 //  File........: ADC.c
@@ -170,7 +171,7 @@ void ADC_periphery(void)
     int ADCresult_temp = 0;
     int Temp_int;
     char Temp;
-    unsigned char i = 0;
+    uint8_t i = 0;
     char TL;
     char TH;
     char VL;

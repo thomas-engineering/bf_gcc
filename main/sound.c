@@ -220,7 +220,7 @@ void Sound_Init(void)
 *
 *****************************************************************************/
 // mt inserted local helper to save some flash-space
-static void showSongName(unsigned char songnum)
+static void showSongName(uint8_t songnum)
 {
     LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[songnum]), 1);  // mt   // Set up the a song in the LCD
 }
@@ -392,7 +392,7 @@ char Sound(char input)
 *****************************************************************************/
 void Play_Tune(void)
 {
-    unsigned int temp_tone;	// mt 200301
+    uint16_t temp_tone;	// mt 200301
     int temp_hi;
     
     char loop;
@@ -489,7 +489,7 @@ void Play_Tune(void)
 *****************************************************************************/
 void PlayClick(void)
 {
-	unsigned char i;
+	uint8_t i;
 	for (i = 0; i < 10; i++) {
 		cbiBF(PORTB, 5);
 		Delay(1);
