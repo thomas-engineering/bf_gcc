@@ -23,6 +23,7 @@
 //#include <inavr.h>
 //#include "iom169.h"
 #include <avr/io.h>
+#include <util/atomic.h>
 #include <avr/pgmspace.h>
 #include "button.h"
 
@@ -155,6 +156,51 @@ int ADC_read(void)
 
 /*****************************************************************************
 *
+*   Periodic measurement. The Timer0 ISR must stay short, so it only sets a
+*   flag; ADC_Service() (called from the main loop) does the conversion.
+*
+*****************************************************************************/
+static volatile uint8_t ADC_Pending = 0;
+
+// Timer0 callback (runs in the ISR): only flag that a measurement is due.
+static void ADC_Tick(void)
+{
+    ADC_Pending = 1;
+}
+
+void ADC_StartAuto(void)
+{
+    Timer0_RegisterCallbackFunction(ADC_Tick);
+}
+
+void ADC_StopAuto(void)
+{
+    Timer0_RemoveCallbackFunction(ADC_Tick);
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        ADC_Pending = 0;        // a stale request must not run in another menu
+    }
+}
+
+// Called from the main loop: run the measurement if the ISR asked for it.
+void ADC_Service(void)
+{
+    uint8_t pending;
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        pending = ADC_Pending;
+        ADC_Pending = 0;
+    }
+
+    if (pending)
+        ADC_periphery();
+}
+
+
+/*****************************************************************************
+*
 *   Function name : ADC_periphery
 *
 *   Returns :       None
@@ -267,9 +313,6 @@ void ADC_periphery(void)
         
         }
 
-//        Can't set LCD_UpdateRequired = TRUE here cause we are inside the Timer0 interrupt
-//        LCD_UpdateRequired(TRUE, 0);        
-
     }
     else if( ADMUX == VOLTAGE_SENSOR )
     {
@@ -330,8 +373,6 @@ void ADC_periphery(void)
         LCD_putc(5, VL);
         LCD_putc(6, '\0');
         
-//        Can't set LCD_UpdateRequired = TRUE here cause we are inside the Timer0 interrupt
-//        LCD_UpdateRequired(TRUE, 0);
                              
     }
     else if( ADMUX == LIGHT_SENSOR )
@@ -358,9 +399,6 @@ void ADC_periphery(void)
         LCD_putc(4, TH);
         LCD_putc(5, TL);
         LCD_putc(6, '\0');
-
-//        Can't set LCD_UpdateRequired = TRUE here cause we are inside the Timer0 interrupt
-//        LCD_UpdateRequired(TRUE, 0);        
 
     }
 }
@@ -389,7 +427,7 @@ char TemperatureFunc(char input)
 
         // Enable auto-run of the ADC_perphery every 10ms 
         // (it will actually be more than 10ms cause of the SLEEP)
-        Timer0_RegisterCallbackFunction(ADC_periphery); 
+        ADC_StartAuto();
     }
     else
         LCD_UpdateRequired(TRUE, 0);        // New data to be presented
@@ -397,7 +435,7 @@ char TemperatureFunc(char input)
     if (input == KEY_PREV)
     {
         // Disable the auto-run of the ADC_periphery
-        Timer0_RemoveCallbackFunction(ADC_periphery);
+        ADC_StopAuto();
         
         enter = 1;  // Set enter to 1 before leaving the TemperatureFunc
         
@@ -445,7 +483,7 @@ char VoltageFunc(char input)
         
         // Enable auto-run of the ADC_perphery every 10ms 
         // (it will actually be more than 10ms cause of the SLEEP)        
-        Timer0_RegisterCallbackFunction(ADC_periphery);        
+        ADC_StartAuto();
     }
     else
         LCD_UpdateRequired(TRUE, 0); 
@@ -453,7 +491,7 @@ char VoltageFunc(char input)
     if (input == KEY_PREV)
     {
         // Disable the auto-run of the ADC_periphery        
-        Timer0_RemoveCallbackFunction(ADC_periphery);
+        ADC_StopAuto();
         
         enter = 1;  // Set enter to 1 before leaving the TemperatureFunc
         
@@ -488,7 +526,7 @@ char LightFunc(char input)
         
         // Enable auto-run of the ADC_perphery every 10ms 
         // (it will actually be more than 10ms cause of the SLEEP)  
-        Timer0_RegisterCallbackFunction(ADC_periphery);        
+        ADC_StartAuto();
     }
     else
         LCD_UpdateRequired(TRUE, 0); 
@@ -496,7 +534,7 @@ char LightFunc(char input)
     if (input == KEY_PREV)
     {
         // Disable the auto-run of the ADC_periphery      
-        Timer0_RemoveCallbackFunction(ADC_periphery);
+        ADC_StopAuto();
         
         enter = 1;  // Set enter to 1 before leaving the TemperatureFunc
     

@@ -42,6 +42,10 @@ volatile uint8_t gButtonTimeout = FALSE;
 volatile char KEY = KEY_NULL;
 volatile char KEY_VALID = FALSE;
 
+// Set by PinChangeInterrupt(), cleared by Button_ServiceClick(): the click takes
+// about 20 ms and must not be played with interrupts disabled.
+static volatile uint8_t ClickRequest = FALSE;
+
 char CountdownTimerHandle;
 
 /*****************************************************************************
@@ -143,7 +147,7 @@ void PinChangeInterrupt(void)
                 KEY = key;          // Store key in global key buffer
                 KEY_VALID = TRUE;
                 if (gKeyClickStatus)
-                  PlayClick();
+                    ClickRequest = TRUE;
             }
 
          gButtonTimeout = FALSE;
@@ -185,4 +189,31 @@ char getkey(void)
     }
 
     return k;
+}
+
+
+/*****************************************************************************
+*
+*   Function name : Button_ServiceClick
+*
+*   Returns :       None
+*
+*   Parameters :    None
+*
+*   Purpose :       Play the key click that PinChangeInterrupt() asked for.
+*                   Call from the main loop, never from an interrupt.
+*
+*****************************************************************************/
+void Button_ServiceClick(void)
+{
+    uint8_t request;
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        request = ClickRequest;
+        ClickRequest = FALSE;
+    }
+
+    if (request)
+        PlayClick();
 }

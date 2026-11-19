@@ -33,6 +33,7 @@
 
 
 void PinChangeInterrupt(void);
+void Button_ServiceClick(void);
 void Button_Init(void);
 char getkey(void);
 char ButtonBouncing(void);

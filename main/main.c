@@ -121,6 +121,9 @@ int main(void)
 
     for (;;)            // Main loop
     {
+        Button_ServiceClick();  // key click requested by the pin change ISR
+        ADC_Service();          // measurement requested by the Timer0 ISR
+
         if(!PowerSave)          // Do not enter main loop in power-save
         {
             // Plain menu text

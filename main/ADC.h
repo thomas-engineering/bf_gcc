@@ -12,6 +12,12 @@ void ADC_init(char );
 int ADC_read(void);
 void ADC_periphery(void);
 
+// Periodic measurement: the Timer0 ISR only sets a flag, ADC_Service() (main loop)
+// does the conversion.
+void ADC_StartAuto(void);
+void ADC_StopAuto(void);
+void ADC_Service(void);
+
 // Temperature sensor function
 char TemperatureFunc(char);
 
