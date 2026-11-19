@@ -183,7 +183,7 @@ BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
 }
 
 
-char Timer0_AllocateCountdownTimer()
+char Timer0_AllocateCountdownTimer(void)
 {
     // mt char i;
     uint8_t i;
