@@ -44,7 +44,7 @@ uint8_t gUART = FALSE;
 // mt s/index/indexps
 //char index = 0;         //variable to keep the lenght of the present string
 uint8_t indexps = 0;
-char Name[STRLENGHT + 1];    // +1: room for the terminator of a full-length name
+char Name[STRLENGTH + 1];    // +1: room for the terminator of a full-length name
 
 // mt: jw method used 
 /// const char TEXT_WAIT[] PROGMEM                = "waiting for input on RS232";
@@ -68,7 +68,7 @@ uint8_t vCard(uint8_t input)
 	{
 		indexps=eeprom_read_byte(&EEPROM_VCARD->length);
 
-		if((indexps < 1) || (indexps > STRLENGHT))   // if illegal length / mt: fixed, was: |    
+		if((indexps < 1) || (indexps > STRLENGTH))   // if illegal length / mt: fixed, was: |    
 		{
 			indexps = 0;
 			Name[0] = 'A';
@@ -203,7 +203,7 @@ uint8_t EnterName(uint8_t input)
 	}
 	else if (input == KEY_NEXT)
 	{
-		if(indexps < STRLENGHT-1) // mt 5/2007: -1
+		if(indexps < STRLENGTH-1) // mt 5/2007: -1
 		{
 			i = Name[indexps]; // ext. mt 1/2006
 			indexps++;
@@ -241,7 +241,7 @@ uint8_t RS232(uint8_t input)
 {
     static uint8_t enter = 1;
     char c;
-    static char buffer[STRLENGHT];
+    static char buffer[STRLENGTH];
     //static char temp_index;
     static uint8_t temp_index;
     
@@ -263,7 +263,7 @@ uint8_t RS232(uint8_t input)
         c = UDR;
         if (c != '\r')
         {
-            if (temp_index < STRLENGHT-1) // mt 5/2007: -1
+            if (temp_index < STRLENGTH-1) // mt 5/2007: -1
                 buffer[temp_index++] = c;
         }
         else    // UART transmission completed

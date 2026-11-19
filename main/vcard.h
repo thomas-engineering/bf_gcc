@@ -4,7 +4,7 @@ uint8_t RS232(uint8_t input);
 uint8_t vCard(uint8_t input);
 uint8_t EnterName(uint8_t input);
 
-#define STRLENGHT    25
+#define STRLENGTH    25
 
 // Layout of the stored name in EEPROM. It sits at the fixed address 0x100
 // (as in the original ATMEL firmware); an EEMEM variable would be placed at
@@ -12,7 +12,7 @@ uint8_t EnterName(uint8_t input);
 typedef struct
 {
     uint8_t length;             // number of characters in name[]
-    char    name[STRLENGHT];
+    char    name[STRLENGTH];
 } VCARD_EEPROM;
 #define EEPROM_VCARD ((VCARD_EEPROM *)0x100)
 
