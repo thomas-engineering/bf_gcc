@@ -267,14 +267,14 @@ int main(void)
 *
 *   Returns :       nextstate
 *
-*   Parameters :    state, stimuli
+*   Parameters :    cur_state, stimuli
 *
 *   Purpose :       Shifts between the different states
 *
 *****************************************************************************/
-unsigned char StateMachine(char state, unsigned char stimuli)
+unsigned char StateMachine(char cur_state, unsigned char stimuli)
 {
-    unsigned char nextstate = state;    // Default stay in same state
+    unsigned char nextstate = cur_state;    // Default stay in same state
     unsigned char i, j;
 
     // mt: for (i=0; menu_nextstate[i].state; i++)
@@ -282,7 +282,7 @@ unsigned char StateMachine(char state, unsigned char stimuli)
     {
         // mt: if (menu_nextstate[i].state == state && menu_nextstate[i].input == stimuli)
         // mt 1/06 : if (pgm_read_byte(&menu_nextstate[i].state) == state && 
-        if ( j == state && 
+        if ( j == cur_state && 
              pgm_read_byte(&menu_nextstate[i].input) == stimuli)
         {
             // This is the one!

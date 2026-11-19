@@ -474,7 +474,7 @@ unsigned char BufferLoad(unsigned int size, unsigned char mem)
 	
 	// store values to be programmed in temporary buffer
 	for (cnt=0; cnt<UART_RX_BUFFER_SIZE; cnt++) {
-		if (cnt<size) gBuffer[cnt]=recchar();
+		if ((unsigned int)cnt<size) gBuffer[cnt]=recchar();
 		else gBuffer[cnt]=0xFF;
 	}
 	cnt=0;

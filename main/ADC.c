@@ -190,7 +190,7 @@ void ADC_periphery(void)
                 for (i=0; i<=25; i++)   // Find the temperature
                 {
                     // mt if (ADCresult <= TEMP_Celcius_neg[i])
-                    if (ADCresult <= pgm_read_word(&TEMP_Celsius_neg[i]))
+                    if (ADCresult <= (int)pgm_read_word(&TEMP_Celsius_neg[i]))
                     {
                         break;
                     }
@@ -203,7 +203,7 @@ void ADC_periphery(void)
                 for (i=0; i<100; i++)  
                 {
                     // mt if (ADCresult >= TEMP_Celcius_pos[i])
-                    if (ADCresult >= pgm_read_word(&TEMP_Celsius_pos[i]))
+                    if (ADCresult >= (int)pgm_read_word(&TEMP_Celsius_pos[i]))
                     {
                         break;
                     }
@@ -235,7 +235,7 @@ void ADC_periphery(void)
             for (i=0; i<=141; i++)   // Find the temperature
             {
                 // mt if (ADCresult > TEMP_Farenheit_pos[i])
-                if (ADCresult > pgm_read_word(&TEMP_Fahrenheit_pos[i]))
+                if (ADCresult > (int)pgm_read_word(&TEMP_Fahrenheit_pos[i]))
                 {
                     break;
                 }
@@ -285,7 +285,7 @@ void ADC_periphery(void)
         for (i=0; i<=22; i++)
         {
             // mt if (ADCresult <= LIGHT_ADC[i])
-            if (ADCresult <= pgm_read_word(&LIGHT_ADC[i]))
+            if (ADCresult <= (int)pgm_read_word(&LIGHT_ADC[i]))
             {
                 break;
             }

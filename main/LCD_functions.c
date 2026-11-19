@@ -57,6 +57,7 @@ uint8_t CONTRAST = LCD_INITIAL_CONTRAST;
 // mt void LCD_puts_f(char __flash *pFlashStr, char scrollmode)
 void LCD_puts_f(const char *pFlashStr, char scrollmode)
 {
+    (void)scrollmode;   // not used in this port
     // char i;
     uint8_t i;
 
@@ -101,6 +102,7 @@ void LCD_puts_f(const char *pFlashStr, char scrollmode)
 *****************************************************************************/
 void LCD_puts(char *pStr, char scrollmode)
 {
+    (void)scrollmode;   // not used in this port
     uint8_t i; // char i;
 
     while (gLCD_Update_Required);      // Wait for access to buffer
