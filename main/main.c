@@ -54,6 +54,7 @@
 #endif
 
 #include "main.h"
+#include "board.h"
 #include "LCD_functions.h"
 #include "LCD_driver.h"
 #include "button.h"
@@ -332,8 +333,8 @@ void Initialization(void)
     // mt PORTE = (15<<PORTE4);
     PORTE = (15<<PE4);
 
-    sbiBF(DDRB, 5);               // set OC1A as output
-    sbiBF(PORTB, 5);              // set OC1A high
+    sbiBF(SPEAKER_DDR, SPEAKER_PIN);    // set OC1A as output
+    sbiBF(SPEAKER_PORT, SPEAKER_PIN);   // set OC1A high
             
     Button_Init();              // Initialize pin change interrupt on joystick
     
@@ -341,7 +342,7 @@ void Initialization(void)
 
     Timer0_Init();              // Used when playing music etc.
 
-    USART_Init(12);             // Baud rate = 9600bps
+    USART_Init(UART_UBRR);      // 19200 bps (at 2 MHz, see board.h)
     
     DF_SPI_init();              // init the SPI interface to communicate with the DataFlash
     

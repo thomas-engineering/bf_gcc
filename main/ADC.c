@@ -27,6 +27,7 @@
 #include "button.h"
 
 #include "main.h"
+#include "board.h"
 #include "ADC.h"
 #include "BCD.h"
 #include "LCD_functions.h"
@@ -121,8 +122,8 @@ int ADC_read(void)
     
     // To save power, the voltage over the LDR and the NTC is turned off when not used
     // This is done by controlling the voltage from a I/O-pin (PORTF3)
-    sbiBF(PORTF, PF3); // mt sbi(PORTF, PORTF3);     // Enable the VCP (VC-peripheral)
-    sbiBF(DDRF, DDF3); // sbi(DDRF, PORTF3);        
+    sbiBF(VCP_PORT, VCP_PIN); // mt sbi(PORTF, PORTF3);     // Enable the VCP (VC-peripheral)
+    sbiBF(VCP_DDR, VCP_PIN); // sbi(DDRF, PORTF3);        
 
     sbiBF(ADCSRA, ADEN);     // Enable the ADC
 
@@ -143,8 +144,8 @@ int ADC_read(void)
 
     ADCr = ADCr >> 3;     // average the 8 samples
         
-    cbiBF(PORTF,PF3); // mt cbi(PORTF, PORTF3);     // disable the VCP
-    cbiBF(DDRF,DDF3); // mt cbi(DDRF, PORTF3);  
+    cbiBF(VCP_PORT, VCP_PIN); // mt cbi(PORTF, PORTF3);     // disable the VCP
+    cbiBF(VCP_DDR, VCP_PIN); // mt cbi(DDRF, PORTF3);  
     
     cbiBF(ADCSRA, ADEN);      // disable the ADC
 

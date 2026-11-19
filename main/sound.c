@@ -30,6 +30,7 @@
 #include <util/atomic.h>
 #include "main.h"
 #include "sound.h"
+#include "board.h"
 #include "timer0.h"
 #include "LCD_functions.h"
 #include "button.h"
@@ -351,7 +352,7 @@ char Sound(char input)
             Timer0_RemoveCallbackFunction(Play_Tune);
             TCCR1A = 0;
             TCCR1B = 0;
-            sbiBF(PORTB, 5);              // set OC1A high
+            sbiBF(SPEAKER_PORT, SPEAKER_PIN);              // set OC1A high
             enter = 1;
             return ST_MUSIC_SELECT;
         }
@@ -371,7 +372,7 @@ char Sound(char input)
         Timer0_RemoveCallbackFunction(Play_Tune);
         TCCR1A = 0;
         TCCR1B = 0;
-        sbiBF(PORTB, 5);              // set OC1A high
+        sbiBF(SPEAKER_PORT, SPEAKER_PIN);              // set OC1A high
         enter = 1;
         return ST_MUSIC_SELECT;
     }
@@ -464,7 +465,7 @@ void Play_Tune(void)
                 Timer0_RemoveCallbackFunction(Play_Tune);
                 TCCR1A = 0;
                 TCCR1B = 0;
-                sbiBF(PORTB, 5);              // set OC1A high
+                sbiBF(SPEAKER_PORT, SPEAKER_PIN);              // set OC1A high
             }
         }
         
@@ -491,9 +492,9 @@ void PlayClick(void)
 {
 	uint8_t i;
 	for (i = 0; i < 10; i++) {
-		cbiBF(PORTB, 5);
+		cbiBF(SPEAKER_PORT, SPEAKER_PIN);
 		Delay(1);
-		sbiBF(PORTB, 5);
+		sbiBF(SPEAKER_PORT, SPEAKER_PIN);
 		Delay(1);
 	}
 }
