@@ -20,8 +20,6 @@
 //
 //***************************************************************************
 
-//#include <inavr.h>
-//#include "iom169.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -90,9 +88,6 @@ void Timer0_Init(void)
 *   Purpose :       Check if any functions are to be called
 *
 *****************************************************************************/
-// #pragma vector = TIMER0_COMP_vect
-// __interrupt void TIMER0_COMP_interrupt(void)
-// SIGNAL(SIG_OUTPUT_COMPARE0)
 ISR(TIMER0_COMP_vect)
 {
     // mt char i;

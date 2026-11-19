@@ -1,12 +1,8 @@
 #define TEMPERATURE_SENSOR  0
 #define VOLTAGE_SENSOR      1
 #define LIGHT_SENSOR        2
-//#define CELCIUS             3
-//#define FARENHEIT           4
 #define CELSIUS             3
 #define FAHRENHEIT           4
-
-//#define Vref                2.85
 
 void ADC_init(uint8_t );
 uint16_t ADC_read(void);

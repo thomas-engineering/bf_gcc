@@ -20,8 +20,6 @@
 //  20070517        - option to enable transmit                     - mt
 //***************************************************************************
 
-//#include <inavr.h>
-//#include "iom169.h"
 #include <avr/io.h>
 #include "main.h"
 #include "usart.h"

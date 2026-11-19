@@ -20,8 +20,6 @@
 //
 //***************************************************************************
 
-//#include <inavr.h>
-//#include "iom169.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -78,8 +76,6 @@ void Button_Init(void)
     CountdownTimerHandle = Timer0_AllocateCountdownTimer();
 }
 
-// #pragma vector = PCINT0_vect
-// __interrupt void PCINT0_interrupt(void)
 ISR(PCINT0_vect)
 {
     PinChangeInterrupt();

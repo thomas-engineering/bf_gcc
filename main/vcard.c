@@ -23,9 +23,6 @@
 //
 //***************************************************************************
 
-//#include <inavr.h>
-//#include "iom169.h"
-//#include "eeprom.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>

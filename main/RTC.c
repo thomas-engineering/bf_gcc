@@ -649,9 +649,6 @@ uint8_t SetDateFormat(uint8_t input)
 *            The interrupt occurs once a second (running from the 32kHz crystal)
 *
 *******************************************************************************/
-// #pragma vector = TIMER2_OVF_vect
-// __interrupt void TIMER2_OVF_interrupt(void)
-// SIGNAL(SIG_OVERFLOW2)
 ISR(TIMER2_OVF_vect)
 {
     gSECOND++;               // increment second

@@ -20,8 +20,6 @@
 //
 //***************************************************************************
 
-//#include <inavr.h>
-//#include "iom169.h"
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include "main.h"

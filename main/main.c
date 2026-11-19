@@ -37,8 +37,6 @@
 // "// mtE" but forgot this for some changes esp. during debugging. 'diff' 
 // against the original code to see everything that has been changed.
 
-//#include <inavr.h>
-//#include "iom169.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>

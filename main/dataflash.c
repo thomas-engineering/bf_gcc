@@ -45,8 +45,6 @@
 */
 
 // Includes
-//#include <INA90.H>
-//#include "iom169.h"
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
