@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install avr-gcc
+        run: sudo apt-get update && sudo apt-get install -y gcc-avr avr-libc binutils-avr
+
+      - name: Build application
+        run: make -C main clean all
+
+      - name: Build bootloader
+        run: make -C bf_boot clean all
+
+      - name: Show sizes
+        run: |
+          avr-size main/build/main.elf
+          avr-size bf_boot/build/main.elf
+
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run host unit tests
+        run: make -C tests clean test
