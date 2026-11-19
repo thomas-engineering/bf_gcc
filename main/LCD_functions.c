@@ -40,7 +40,6 @@
 uint8_t CONTRAST = LCD_INITIAL_CONTRAST;
 
 // Start-up delay before scrolling a string over the LCD. "LCD_driver.c"
-extern volatile char gLCD_Start_Scroll_Timer;
 
 /****************************************************************************
 *

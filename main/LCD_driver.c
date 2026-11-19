@@ -41,7 +41,6 @@
 #endif
 
 // Variable from "button.c" to prevent button-bouncing
-extern unsigned char gButtonTimeout;    
 
 volatile char gAutoPressJoystick = FALSE;
 

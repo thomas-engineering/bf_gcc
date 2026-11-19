@@ -34,6 +34,8 @@ static inline void SetClockPrescaler(uint8_t clkps)
 
 #define BOOL    char
 
+extern volatile BOOL gKeyClickStatus;   // keyclick on/off, defined in main.c
+
 #ifndef FALSE
 #define FALSE   0
 #define TRUE    (!FALSE)

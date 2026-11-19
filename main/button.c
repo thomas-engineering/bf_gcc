@@ -31,12 +31,8 @@
 #include "timer0.h"
 // for keyclick:
 #include "sound.h"
-
-// mt/v6 - keyclick (see main.c)
-extern volatile BOOL gKeyClickStatus;
-
-// extern char gPowerSaveTimer;
-extern volatile uint8_t gPowerSaveTimer;
+// for gPowerSaveTimer:
+#include "RTC.h"
 
 // mt  unsigned char gButtonTimeout = FALSE;
 volatile unsigned char gButtonTimeout = FALSE;

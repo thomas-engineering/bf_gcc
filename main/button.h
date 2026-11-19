@@ -36,3 +36,5 @@ void Button_Init(void);
 char getkey(void);
 char ButtonBouncing(void);
 
+extern volatile unsigned char gButtonTimeout;   // set in LCD_SOF_interrupt (LCD_driver.c)
+
