@@ -126,6 +126,28 @@ void RTC_init(void)
 }
 
 
+// Consistent snapshots of the time/date: Time_update() (Timer2 ISR) changes
+// several of these variables, and gYEAR is 16 bit (not atomic on 8-bit AVR).
+static void GetTime(uint8_t *hour, uint8_t *minute, uint8_t *second)
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        *hour   = gHOUR;
+        *minute = gMINUTE;
+        *second = gSECOND;
+    }
+}
+
+static void GetDate(uint16_t *year, uint8_t *month, uint8_t *day)
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        *year  = gYEAR;
+        *month = gMONTH;
+        *day   = gDAY;
+    }
+}
+
 /*****************************************************************************
 *
 *   Function name : ShowClock
@@ -141,20 +163,23 @@ char ShowClock(char input)
 {
     //char HH, HL, MH, ML, SH, SL;
     uint8_t HH, HL, MH, ML, SH, SL;
+    uint8_t hour, minute, second;
+
+    GetTime(&hour, &minute, &second);
 
     if (clockformat == CLOCK_12)    // if 12H clock
-        HH = CHAR2BCD2(TBL_CLOCK_12[gHOUR]);   
+        HH = CHAR2BCD2(TBL_CLOCK_12[hour]);   
     else
-        HH = CHAR2BCD2(gHOUR);
+        HH = CHAR2BCD2(hour);
         
     HL = (HH & 0x0F) + '0';
     HH = (HH >> 4) + '0';
 
-    MH = CHAR2BCD2(gMINUTE);
+    MH = CHAR2BCD2(minute);
     ML = (MH & 0x0F) + '0';
     MH = (MH >> 4) + '0';
 
-    SH = CHAR2BCD2(gSECOND);
+    SH = CHAR2BCD2(second);
     SL = (SH & 0x0F) + '0';
     SH = (SH >> 4) + '0';
 
@@ -206,9 +231,7 @@ char SetClock(char input)
 
     if (enter_function)
     {
-        time[HOUR] = gHOUR;
-        time[MINUTE] = gMINUTE;
-        time[SECOND] = gSECOND;
+        GetTime(&time[HOUR], &time[MINUTE], &time[SECOND]);
     }
 
     if (clockformat == CLOCK_12)    // if 12H clock
@@ -375,16 +398,20 @@ char SetClockFormat(char input)
 char ShowDate(char input)
 {
     char YH, YL, MH, ML, DH, DL;
+    uint16_t year;
+    uint8_t month, day;
 
-    YH = CHAR2BCD2(gYEAR);
+    GetDate(&year, &month, &day);
+
+    YH = CHAR2BCD2(year);
     YL = (YH & 0x0F) + '0';
     YH = (YH >> 4) + '0';
 
-    MH = CHAR2BCD2(gMONTH);
+    MH = CHAR2BCD2(month);
     ML = (MH & 0x0F) + '0';
     MH = (MH >> 4) + '0';
 
-    DH = CHAR2BCD2(gDAY);
+    DH = CHAR2BCD2(day);
     DL = (DH & 0x0F) + '0';
     DH = (DH >> 4) + '0';
 
@@ -448,12 +475,15 @@ char SetDate(char input)
 	uint8_t YH, YL, MH, ML, DH, DL;
 	uint8_t MonthLength_temp;
 	uint8_t LeapMonth;
+    uint16_t cur_year;
+    uint8_t cur_month, cur_day;
 
     if (enter_function)
     {
-        date[YEAR] = gYEAR;
-        date[MONTH] = gMONTH;
-        date[DAY] = gDAY;
+        uint16_t year;
+
+        GetDate(&year, &date[MONTH], &date[DAY]);
+        date[YEAR] = year;
     }
 
     if (mode == YEAR)
@@ -552,10 +582,11 @@ char SetDate(char input)
         date[MONTH] = 1;
 
     // Check for leap year, if month == February
-    if (gMONTH == 2)
-        if (!(gYEAR & 0x0003))              // if (gYEAR%4 == 0)
-            if (gYEAR%100 == 0)
-                if (gYEAR%400 == 0)
+    GetDate(&cur_year, &cur_month, &cur_day);
+    if (cur_month == 2)
+        if (!(cur_year & 0x0003))           // if (cur_year%4 == 0)
+            if (cur_year%100 == 0)
+                if (cur_year%400 == 0)
                     LeapMonth = 1;
                 else
                     LeapMonth = 0;
