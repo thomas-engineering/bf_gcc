@@ -436,14 +436,8 @@ end:
 
 # Display size of file.
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(OUT).hex
-# The AVR size format (-C --mcu) exists only in the Atmel/Arduino binutils;
-# other builds of avr-size (e.g. Ubuntu's binutils-avr) get the default format.
-SIZE_HELP := $(shell $(SIZE) --help)
-ifneq ($(findstring --mcu,$(SIZE_HELP)),)
-ELFSIZE = $(SIZE) -C --mcu=${MCU} --format=avr $(OUT).elf
-else
-ELFSIZE = $(SIZE) $(OUT).elf
-endif
+# Long options only: the Atmel/Arduino avr-size accepts -C, Ubuntu's binutils-avr does not.
+ELFSIZE = $(SIZE) --mcu=${MCU} --format=avr $(OUT).elf
 
 sizebefore:
 	$(if $(wildcard $(OUT).elf),$(info )$(info $(MSG_SIZE_BEFORE)))
