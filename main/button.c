@@ -81,12 +81,9 @@ ISR(PCINT0_vect)
     PinChangeInterrupt();
 }
 
-// #pragma vector = PCINT1_vect
-// __interrupt void PCINT1_interrupt(void)
-ISR(PCINT1_vect)
-{
-    PinChangeInterrupt();
-}
+// Same handler for both pin-change vectors. An alias keeps GCC from folding
+// the two identical bodies into a nested call (double prologue, early reti).
+ISR_ALIAS(PCINT1_vect, PCINT0_vect);
 
 
 /*****************************************************************************
