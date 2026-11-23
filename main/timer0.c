@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly Timer0 routines
 //
@@ -17,6 +17,7 @@
 //  20030116 - 1.0  - Created                                       - KS
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20070129          SIGNAL->ISR                                   - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -34,7 +35,6 @@ TIMER_CALLBACK_FUNC CallbackFunc[TIMER0_NUM_CALLBACKS];
 // 1-254  The timer is counting down
 // 255    Free timer
 
-// mt char CountDownTimers[TIMER0_NUM_COUNTDOWNTIMERS];
 uint8_t CountDownTimers[TIMER0_NUM_COUNTDOWNTIMERS];
 
 /*****************************************************************************
@@ -54,12 +54,14 @@ void Timer0_Init(void)
     uint8_t i;
 
     // Initialize array of callback functions
-    for (i=0; i<TIMER0_NUM_CALLBACKS; i++)
+    for (i=0; i<TIMER0_NUM_CALLBACKS; i++) {
         CallbackFunc[i] = NULL;
+    }
 
     // Initialize countdown timers
-    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++)
+    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++) {
         CountDownTimers[i] = 255;
+    }
 
 
     // Initialize Timer0.
@@ -93,14 +95,18 @@ ISR(TIMER0_COMP_vect)
     // mt char i;
     uint8_t i;
     
-    for (i=0; i<TIMER0_NUM_CALLBACKS; i++)
-        if (CallbackFunc[i] != NULL)
+    for (i=0; i<TIMER0_NUM_CALLBACKS; i++) {
+        if (CallbackFunc[i] != NULL) {
             CallbackFunc[i]();
+        }
+    }
     
     // Count down timers
-    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++)
-        if (CountDownTimers[i] != 255 && CountDownTimers[i] != 0)
+    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++) {
+        if (CountDownTimers[i] != 255 && CountDownTimers[i] != 0) {
             CountDownTimers[i]--;
+        }
+    }
 
 }
 
@@ -117,31 +123,30 @@ ISR(TIMER0_COMP_vect)
 *                   TIMER0_COMP_interrupt
 *
 *****************************************************************************/
-BOOL Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
+bool Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
 {
-    // mt char i;
     uint8_t i;
     
     for (i=0; i<TIMER0_NUM_CALLBACKS; i++)
     {
-        if (CallbackFunc[i] == pFunc)
-            return TRUE;
+        if (CallbackFunc[i] == pFunc) {
+            return true;
+        }
     }
     
     for (i=0; i<TIMER0_NUM_CALLBACKS; i++)
     {
-        if (CallbackFunc[i] == NULL)
-        {
+        if (CallbackFunc[i] == NULL) {
             // 16-bit store: the ISR must not see a half-written pointer
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
                 CallbackFunc[i] = pFunc;
             }
-            return TRUE;
+            return true;
         }   
     }
     
-    return FALSE;
+    return false;
 }
 
 
@@ -157,38 +162,35 @@ BOOL Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
 *                   TIMER0_COMP_interrupt
 *
 *****************************************************************************/
-BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
+bool Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc)
 {
-    // mt char i;
     uint8_t i;
     
     for (i=0; i<TIMER0_NUM_CALLBACKS; i++)
     {
-        if (CallbackFunc[i] == pFunc)
-        {
+        if (CallbackFunc[i] == pFunc) {
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
                 CallbackFunc[i] = NULL;
             }
-            return TRUE;
+            return true;
         }
     }
         
-    return FALSE;
+    return false;
 }
 
 
 uint8_t Timer0_AllocateCountdownTimer(void)
 {
-    // mt char i;
     uint8_t i;
 
-    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++)
-        if (CountDownTimers[i] == 255)
-        {
+    for (i=0; i<TIMER0_NUM_COUNTDOWNTIMERS; i++) {
+        if (CountDownTimers[i] == 255) {
             CountDownTimers[i] = 0;
             return i+1;
         }
+    }
 
     return 0;
 }

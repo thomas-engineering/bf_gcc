@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly button handling routines
 //
@@ -17,6 +17,7 @@
 //  20030116 - 1.0  - Created                                       - KS
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20070129          SIGNAL->ISR                                   - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -32,17 +33,14 @@
 // for gPowerSaveTimer:
 #include "RTC.h"
 
-// mt  uint8_t gButtonTimeout = FALSE;
-volatile uint8_t gButtonTimeout = FALSE;
+volatile bool gButtonTimeout = false;
 
-//char KEY = NULL;
-//char KEY_VALID = FALSE;
 volatile uint8_t KEY = KEY_NULL;
-volatile uint8_t KEY_VALID = FALSE;
+volatile bool KEY_VALID = false;
 
 // Set by PinChangeInterrupt(), cleared by Button_ServiceClick(): the click takes
 // about 20 ms and must not be played with interrupts disabled.
-static volatile uint8_t ClickRequest = FALSE;
+static volatile bool ClickRequest = false;
 
 uint8_t CountdownTimerHandle;
 
@@ -120,33 +118,37 @@ void PinChangeInterrupt(void)
     buttons |= (~PINE) & PINE_MASK;
 
     // Output virtual keys
-    if (buttons & (1<<BUTTON_A))
+    if (buttons & (1<<BUTTON_A)) {
         key = KEY_PLUS;
-    else if (buttons & (1<<BUTTON_B))
+    }
+    else if (buttons & (1<<BUTTON_B)) {
         key = KEY_MINUS;
-    else if (buttons & (1<<BUTTON_C))
+    }
+    else if (buttons & (1<<BUTTON_C)) {
         key = KEY_PREV;
-    else if (buttons & (1<<BUTTON_D))
+    }
+    else if (buttons & (1<<BUTTON_D)) {
         key = KEY_NEXT;
-    else if (buttons & (1<<BUTTON_O))
+    }
+    else if (buttons & (1<<BUTTON_O)) {
         key = KEY_ENTER;
-    else
+    }
+    else {
         key = KEY_NULL;
+    }
 
     
-    if(key != KEY_NULL)
-    {
-        if(gButtonTimeout)  // gButtonTimeout is set in the LCD_SOF_interrupt in LCD_driver.c
-        {
-            if (!KEY_VALID)
-            {
+    if(key != KEY_NULL) {
+        if(gButtonTimeout) { // gButtonTimeout is set in the LCD_SOF_interrupt in LCD_driver.c
+            if (!KEY_VALID) {
                 KEY = key;          // Store key in global key buffer
-                KEY_VALID = TRUE;
-                if (gKeyClickStatus)
-                    ClickRequest = TRUE;
+                KEY_VALID = true;
+                if (gKeyClickStatus) {
+                    ClickRequest = true;
+                }
             }
 
-         gButtonTimeout = FALSE;
+         gButtonTimeout = false;
     
         }
     }
@@ -175,13 +177,13 @@ uint8_t getkey(void)
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        if (KEY_VALID)              // Check for unread key in buffer
-        {
+        if (KEY_VALID) { // Check for unread key in buffer
             k = KEY;
-            KEY_VALID = FALSE;
+            KEY_VALID = false;
         }
-        else
+        else {
             k = KEY_NULL;           // No key stroke available
+        }
     }
 
     return k;
@@ -202,14 +204,15 @@ uint8_t getkey(void)
 *****************************************************************************/
 void Button_ServiceClick(void)
 {
-    uint8_t request;
+    bool request;
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
         request = ClickRequest;
-        ClickRequest = FALSE;
+        ClickRequest = false;
     }
 
-    if (request)
+    if (request) {
         PlayClick();
+    }
 }

@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly main module
 //
@@ -25,6 +25,7 @@
 //  20070129          update with code from Rev07, using 
 //                    avr-gcc 4.1.1/avr-libc 1.4.5 (WinAVR_20070122)- mt
 //  20070131          avr-libc sleep-functions/macros               - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -63,7 +64,6 @@
 #include "sound.h"
 #include "ADC.h"
 #include "dataflash.h"
-// mt #include "eeprom.h"
 // mt Test() is not realy needed 
 //- can not be accessed without external hardware
 #include "test.h"
@@ -73,10 +73,10 @@
 #define pLCDREG_test (*(uint8_t *)(0xEC))
 
 uint8_t PowerSaveTimeout = 30;     // Initial value, enable power save mode after 30 min
-BOOL AutoPowerSave    = TRUE;   // Variable to enable/disable the Auto Power Save func
-volatile BOOL gKeyClickStatus  = FALSE;  // Variable to enable/disable keyclick
+bool AutoPowerSave    = true;    // Variable to enable/disable the Auto Power Save func
+volatile bool gKeyClickStatus  = false;  // Variable to enable/disable keyclick
 
-uint8_t PowerSave = FALSE;
+bool PowerSave = false;
 
 uint8_t state;  // holds the current state, according to "menu.h"
 
@@ -122,11 +122,9 @@ int main(void)
         Button_ServiceClick();  // key click requested by the pin change ISR
         ADC_Service();          // measurement requested by the Timer0 ISR
 
-        if(!PowerSave)          // Do not enter main loop in power-save
-        {
+        if(!PowerSave) { // Do not enter main loop in power-save
             // Plain menu text
-            if (statetext)
-            {
+            if (statetext) {
                 LCD_puts_f(statetext, 1);
                 LCD_Colon(0);
                 statetext = NULL;
@@ -134,27 +132,23 @@ int main(void)
  
             input = getkey();           // Read buttons
     
-            if (pStateFunc)
-            {
+            if (pStateFunc) {
                 // When in this state, we must call the state function
                 nextstate = pStateFunc(input);
             }
-            else if (input != KEY_NULL)
-            {
+            else if (input != KEY_NULL) {
                 // Plain menu, clock the state machine
                 nextstate = StateMachine(state, input);
             }
     
-            if (nextstate != state)
-            {
+            if (nextstate != state) {
                 state = nextstate;
                 // mt: for (i=0; menu_state[i].state; i++)
                 for (i=0; (j=menu_state[i].state); i++)
                 {
                     //mt: if (menu_state[i].state == state)
                     //mt 1/06 if (menu_state[i].state == state)
-                    if (j == state)
-                    {
+                    if (j == state) {
                         // mt - original: statetext =  menu_state[i].pText;
                         // mt - original: pStateFunc = menu_state[i].pFunc;
                         /// mt this is like the example from an avr-gcc guru (mailing-list):
@@ -170,13 +164,11 @@ int main(void)
         
         
         //enable ATmega169 power save modus if autopowersave
-        if(AutoPowerSave)
-        {
-            if(gPowerSaveTimer >= PowerSaveTimeout)
-            {
+        if(AutoPowerSave) {
+            if(gPowerSaveTimer >= PowerSaveTimeout) {
                 state = ST_AVRBF;
                 gPowerSaveTimer = 0;
-                PowerSave = TRUE;
+                PowerSave = true;
             }
         }
         
@@ -193,29 +185,27 @@ int main(void)
         buttons = (~PINB) & PINB_MASK;
         buttons |= (~PINE) & PINE_MASK;
         
-        if( buttons != last_buttons ) 
-        {
+        if( buttons != last_buttons ) {
             last_buttons = buttons;
-            gAutoPressJoystick = FALSE;
+            gAutoPressJoystick = JOY_IDLE;
         }
-        else if( buttons )
-        {
-            if( gAutoPressJoystick == TRUE)
-            {
+        else if( buttons ) {
+            if( gAutoPressJoystick == JOY_PRESSED) {
                 PinChangeInterrupt();
-                gAutoPressJoystick = AUTO;
+                gAutoPressJoystick = JOY_AUTO;
             }
-            else    
-                gAutoPressJoystick = AUTO;
+            else {
+                gAutoPressJoystick = JOY_AUTO;
+            }
         }
 
         
         
         // go to SLEEP
-        if(!gPlaying && !gUART)              // Do not enter Power save if using UART or playing tunes
-        {
-            if(PowerSave)
+        if(!gPlaying && !gUART) { // Do not enter Power save if using UART or playing tunes
+            if(PowerSave) {
                 cbiBF(LCDCRA, 7);             // disable LCD
+            }
 
             // "Manual" Power-Save sleep - replaced by avr-libc functions
             // SMCR = (3<<SM0) | (1<<SE);   // Enable Power-save mode
@@ -224,11 +214,9 @@ int main(void)
             set_sleep_mode(SLEEP_MODE_PWR_SAVE);
             sleep_mode();
 
-            if(PowerSave)
-            {
-                if(!(PINB & 0x40))              // press UP to wake from SLEEP
-                {
-                    PowerSave = FALSE;
+            if(PowerSave) {
+                if(!(PINB & 0x40)) { // press UP to wake from SLEEP
+                    PowerSave = false;
                     
                     for(i = 0; i < 20; i++ ) // set all LCD segment register to the variable ucSegments
                     {
@@ -240,8 +228,7 @@ int main(void)
                 }
             }
         }
-        else
-        {
+        else {
            // "Manual" Power-Save sleep - replaced by avr-libc functions
            // SMCR = (1<<SE);            // Enable idle mode
            // asm volatile ("sleep"::);  // __sleep();  // Go to sleep
@@ -286,8 +273,7 @@ uint8_t StateMachine(uint8_t cur_state, uint8_t stimuli)
         // mt: if (menu_nextstate[i].state == state && menu_nextstate[i].input == stimuli)
         // mt 1/06 : if (menu_nextstate[i].state == state && 
         if ( j == cur_state && 
-             menu_nextstate[i].input == stimuli)
-        {
+             menu_nextstate[i].input == stimuli) {
             // This is the one!
             // mt: nextstate = menu_nextstate[i].nextstate;
             nextstate = menu_nextstate[i].nextstate;
@@ -376,20 +362,17 @@ uint8_t BootFunc(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
         // mt jw LCD_puts_f(TEXT_BOOT, 1);
         LCD_puts_f(PSTR("Jump to bootloader"), 1);
     }
-    else if(input == KEY_ENTER)
-    {
+    else if(input == KEY_ENTER) {
         WDTCR = (1<<WDCE) | (1<<WDE);     //Enable Watchdog Timer to give reset
         while(1);   // wait for watchdog-reset, since the BOOTRST-fuse is 
                     // programmed, the Boot-section will be entered upon reset.
     }
-    else if (input == KEY_PREV)
-    {
+    else if (input == KEY_PREV) {
         enter = 1;
         return ST_OPTIONS_BOOT;
     }
@@ -418,20 +401,17 @@ uint8_t PowerSaveFunc(uint8_t input)
 {
     static uint8_t enter = 1;    
     
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
         //mt jw LCD_puts_f(TEXT_POWER, 1);
         LCD_puts_f(PSTR("Press enter to sleep"), 1);
     }
-    else if(input == KEY_ENTER)
-    {
-        PowerSave = TRUE;
+    else if(input == KEY_ENTER) {
+        PowerSave = true;
         enter = 1;
         return ST_AVRBF;
     }
-    else if (input == KEY_PREV)
-    {
+    else if (input == KEY_PREV) {
         enter = 1;
         return ST_OPTIONS_POWER_SAVE;
     }
@@ -471,57 +451,52 @@ static void AutoPowerShowMin(void)
 	LCD_putc(5, PL);
 	LCD_putc(6, '\0');
 	
-	LCD_UpdateRequired(TRUE, 0);
+	LCD_UpdateRequired(true, 0);
 }
 
 uint8_t AutoPower(uint8_t input)
 {
     static uint8_t enter = 1;    
     
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
         
-        if(AutoPowerSave)  
+        if(AutoPowerSave) {
             AutoPowerShowMin();
-        else
+        }
+        else {
             LCD_puts_f(PSTR("Off"),1);	// mt LCD_puts("Off", 1);        
+        }
     }
-    else if(input == KEY_ENTER)
-    {
+    else if(input == KEY_ENTER) {
          enter = 1;
 
          return ST_OPTIONS_AUTO_POWER_SAVE;
     }
-    else if (input == KEY_PLUS)
-    {
+    else if (input == KEY_PLUS) {
 
         PowerSaveTimeout += 5;
          
-        if(PowerSaveTimeout > 90)
-        {
+        if(PowerSaveTimeout > 90) {
             PowerSaveTimeout = 90;
         }
-        else
-        {    
-            AutoPowerSave = TRUE;
+        else {    
+            AutoPowerSave = true;
             AutoPowerShowMin();
         }
     }
-    else if (input == KEY_MINUS)
-    {
-        if(PowerSaveTimeout)
+    else if (input == KEY_MINUS) {
+        if(PowerSaveTimeout) {
             PowerSaveTimeout -= 5;
+        }
 
-        if(PowerSaveTimeout < 5)
-        {
-            AutoPowerSave = FALSE;
+        if(PowerSaveTimeout < 5) {
+            AutoPowerSave = false;
             PowerSaveTimeout = 0;
             LCD_puts_f(PSTR("Off"),1);	// mt LCD_puts("Off", 1);
         }
-        else
-        {   
-            AutoPowerSave = TRUE;
+        else {   
+            AutoPowerSave = true;
             AutoPowerShowMin();
         }
     }
@@ -556,8 +531,7 @@ uint8_t KeyClick(uint8_t input)
 		show = 0;
 	}
 		
-	if (input == KEY_ENTER)
-	{
+	if (input == KEY_ENTER) {
 		enter = 1;
 		return ST_OPTIONS_KEYCLICK;
 	}
@@ -568,11 +542,13 @@ uint8_t KeyClick(uint8_t input)
 	}
 
 	if ( show ) {
-		if ( gKeyClickStatus )
+		if ( gKeyClickStatus ) {
 			LCD_puts_f(PSTR("On"),1);
-		else
+		}
+		else {
 			LCD_puts_f(PSTR("Off"),1);
-		LCD_UpdateRequired(TRUE, 0);
+		}
+		LCD_UpdateRequired(true, 0);
 	}
 
 	return ST_OPTIONS_KEYCLICK_FUNC;
@@ -618,8 +594,7 @@ uint8_t Revision(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
         
         LCD_putc(0, 'R');
@@ -631,10 +606,9 @@ uint8_t Revision(uint8_t input)
         LCD_putc(5, (SWLOWLOW + 0x30)); // LCD_putc(5, (SWLOW + 0x30));
         LCD_putc(6, '\0');
         
-        LCD_UpdateRequired(TRUE, 0);          
+        LCD_UpdateRequired(true, 0);          
     }
-    else if (input == KEY_PREV)
-    {
+    else if (input == KEY_PREV) {
         enter = 1;
         return ST_AVRBF;
     }
@@ -659,7 +633,7 @@ uint8_t Revision(uint8_t input)
 *****************************************************************************/
 void OSCCAL_calibration(void)
 {
-    uint8_t calibrate = FALSE;
+    bool calibrate = false;
     uint16_t temp;
     uint8_t tempL;
 
@@ -699,28 +673,25 @@ void OSCCAL_calibration(void)
         sei(); // __enable_interrupt();  // enable global interrupt
     
         // shc/mt if ( (TIFR1 && (1<<TOV1)) )
-        if ( (TIFR1 & (1<<TOV1)) )
-        {
+        if ( (TIFR1 & (1<<TOV1)) ) {
             temp = 0xFFFF;      // if timer1 overflows, set the temp to 0xFFFF
         }
-        else
-        {   // read out the timer1 counter value
+        else {   // read out the timer1 counter value
             tempL = TCNT1L;
             temp = TCNT1H;
             temp = (temp << 8);
             temp += tempL;
         }
     
-        if (temp > 6250)
-        {
+        if (temp > 6250) {
             OSCCAL--;   // the internRC oscillator runs to fast, decrease the OSCCAL
         }
-        else if (temp < 6120)
-        {
+        else if (temp < 6120) {
             OSCCAL++;   // the internRC oscillator runs to slow, increase the OSCCAL
         }
-        else
-            calibrate = TRUE;   // the interRC is correct
+        else {
+            calibrate = true;   // the interRC is correct
+        }
 
         TCCR1B = (1<<CS10); // start timer1
     }

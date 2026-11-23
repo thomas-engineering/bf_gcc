@@ -1,4 +1,8 @@
+#ifndef LCD_FUNCTIONS_H_
+#define LCD_FUNCTIONS_H_
+
 #include <stdint.h>
+#include <stdbool.h>
 //*****************************************************************************
 //
 //  File........: LCD_functions.h
@@ -15,20 +19,21 @@
 //
 //  20021015 - 1.0  - File created                                  - LHM
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //*****************************************************************************
 
-// mt
 #include <avr/pgmspace.h>
+
 //Functions
-// mt void LCD_puts_f(char __flash *pFlashStr, char scrollmode);
-// mt jw writes : ...(char *pFlahsStr...
 void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode);
 void LCD_puts(char *pStr, uint8_t scrollmode);
-void LCD_UpdateRequired(uint8_t update, uint8_t scrollmode);
+void LCD_UpdateRequired(bool update, uint8_t scrollmode);
 //mt void LCD_putc(char digit, char character);
 void LCD_putc(uint8_t digit, char character);
 void LCD_Clear(void);
-void LCD_Colon(uint8_t show);
+void LCD_Colon(bool show);
 void LCD_FlashReset(void);
 uint8_t SetContrast(uint8_t input);
+
+#endif /* LCD_FUNCTIONS_H_ */

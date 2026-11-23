@@ -1,4 +1,8 @@
+#ifndef VCARD_H_
+#define VCARD_H_
+
 #include <stdint.h>
+#include <stdbool.h>
 
 uint8_t RS232(uint8_t input);
 uint8_t vCard(uint8_t input);
@@ -17,4 +21,6 @@ typedef struct
 #define EEPROM_VCARD ((VCARD_EEPROM *)0x100)
 
 // global variable to prevent entering power save, when using the UART
-extern uint8_t gUART;
+extern bool gUART;
+
+#endif /* VCARD_H_ */

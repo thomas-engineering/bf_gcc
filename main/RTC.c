@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: Real Time Clock (RTC)
 //
@@ -18,6 +18,8 @@
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20051107          minior correction (volatiles)                 - mt
 //  20070129          SIGNAL->ISR                                   - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
+//
 //*****************************************************************************
 
 #include <stdint.h>
@@ -32,11 +34,6 @@
 #include "LCD_functions.h"
 #include "BCD.h"
 
-//char gSECOND;
-//char gMINUTE;
-//char gHOUR;
-//char gDAY;
-//char gMONTH;
 volatile uint8_t  gSECOND;
 volatile uint8_t  gMINUTE;
 volatile uint8_t  gHOUR;
@@ -44,8 +41,7 @@ volatile uint8_t  gDAY;
 volatile uint8_t  gMONTH;
 volatile uint16_t gYEAR;
 
-//char gPowerSaveTimer = 0;
-//char dateformat = 0;
+
 volatile uint8_t gPowerSaveTimer = 0;
 uint8_t dateformat = 0;
 
@@ -167,10 +163,12 @@ uint8_t ShowClock(uint8_t input)
 
     GetTime(&hour, &minute, &second);
 
-    if (clockformat == CLOCK_12)    // if 12H clock
+    if (clockformat == CLOCK_12) { // if 12H clock
         HH = CHAR2BCD2(TBL_CLOCK_12[hour]);   
-    else
+    }
+    else {
         HH = CHAR2BCD2(hour);
+    }
         
     HL = (HH & 0x0F) + '0';
     HH = (HH >> 4) + '0';
@@ -193,12 +191,14 @@ uint8_t ShowClock(uint8_t input)
 
     LCD_Colon(1);
 
-    LCD_UpdateRequired(TRUE, 0);
+    LCD_UpdateRequired(true, 0);
 
-    if (input == KEY_PREV)
+    if (input == KEY_PREV) {
         return ST_TIME_CLOCK;
-    else if (input == KEY_NEXT)
+    }
+    else if (input == KEY_NEXT) {
         return ST_TIME_CLOCK_ADJUST;
+    }
       
     return ST_TIME_CLOCK_FUNC;
 }
@@ -222,22 +222,20 @@ uint8_t ShowClock(uint8_t input)
 uint8_t SetClock(uint8_t input)
 {
     static uint8_t enter_function = 1;
-    // static char time[3];    // table holding the temporary clock setting
-    // static char mode = HOUR;
-    // char HH, HL, MH, ML, SH, SL;
-    static uint8_t time[3];
+    static uint8_t time[3]; // table holding the temporary clock setting
     static uint8_t mode = HOUR;
     uint8_t HH, HL, MH, ML, SH, SL;
 
-    if (enter_function)
-    {
+    if (enter_function) {
         GetTime(&time[HOUR], &time[MINUTE], &time[SECOND]);
     }
 
-    if (clockformat == CLOCK_12)    // if 12H clock
+    if (clockformat == CLOCK_12) { // if 12H clock
         HH = CHAR2BCD2(TBL_CLOCK_12[time[HOUR]]);
-    else
+    }
+    else {
         HH = CHAR2BCD2(time[HOUR]);
+    }
         
     HL = (HH & 0x0F) + '0';
     HH = (HH >> 4) + '0';
@@ -260,34 +258,38 @@ uint8_t SetClock(uint8_t input)
 
     LCD_Colon(1);
 
-    if (input != KEY_NULL)
+    if (input != KEY_NULL) {
         LCD_FlashReset();
+    }
 
-    LCD_UpdateRequired(TRUE, 0);
+    LCD_UpdateRequired(true, 0);
     
     enter_function = 1;
 
     // Increment/decrement hours, minutes or seconds
-    if (input == KEY_PLUS)
+    if (input == KEY_PLUS) {
         time[mode]++;
-    else if (input == KEY_MINUS)
+    }
+    else if (input == KEY_MINUS) {
         time[mode]--;
-    else if (input == KEY_PREV)
-    {
-        if (mode == HOUR)
+    }
+    else if (input == KEY_PREV) {
+        if (mode == HOUR) {
             mode = SECOND;
-        else
+        }
+        else {
             mode--;
+        }
     }
-    else if (input == KEY_NEXT)
-    {
-        if (mode == SECOND)
+    else if (input == KEY_NEXT) {
+        if (mode == SECOND) {
             mode = HOUR;
-        else
+        }
+        else {
             mode++;
+        }
     }
-    else if (input == KEY_ENTER)
-    {
+    else if (input == KEY_ENTER) {
         // store the temporary adjusted values to the global variables
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
@@ -300,20 +302,26 @@ uint8_t SetClock(uint8_t input)
     }
 
     /* OPTIMIZE: Can be solved by using a modulo operation */
-    if (time[HOUR] == 255)
+    if (time[HOUR] == 255) {
         time[HOUR] = 23;
-    if (time[HOUR] > 23)
+    }
+    if (time[HOUR] > 23) {
         time[HOUR] = 0;
+    }
 
-    if (time[MINUTE] == 255)
+    if (time[MINUTE] == 255) {
         time[MINUTE] = 59;
-    if (time[MINUTE] > 59)
+    }
+    if (time[MINUTE] > 59) {
         time[MINUTE] = 0;
+    }
 
-    if (time[SECOND] == 255)
+    if (time[SECOND] == 255) {
         time[SECOND] = 59;
-    if (time[SECOND] > 59)
+    }
+    if (time[SECOND] > 59) {
         time[SECOND] = 0;
+    }
 
     enter_function = 0;
     return ST_TIME_CLOCK_ADJUST_FUNC;
@@ -337,44 +345,38 @@ uint8_t SetClockFormat(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
         
-        if(clockformat == CLOCK_24)
+        if(clockformat == CLOCK_24) {
             LCD_puts_f(PSTR("24H"), 1);	 // mt LCD_puts("24H", 1);            
-        else
+        }
+        else {
             LCD_puts_f(PSTR("12H"), 1);	// mt LCD_puts("12H", 1);		
+        }
 
     }
-    if (input == KEY_PLUS)
-    {
-        if(clockformat == CLOCK_24)
-        {
+    if (input == KEY_PLUS) {
+        if(clockformat == CLOCK_24) {
             clockformat = CLOCK_12;
             LCD_puts_f(PSTR("12H"), 1); // mt LCD_puts("12H", 1);
         }
-        else
-        {
+        else {
             clockformat = CLOCK_24;
             LCD_puts_f(PSTR("24H"), 1); // mt LCD_puts("24H", 1);            
         }
     }
-    else if (input == KEY_MINUS)
-    {
-        if(clockformat == CLOCK_12)
-        {
+    else if (input == KEY_MINUS) {
+        if(clockformat == CLOCK_12) {
             clockformat = CLOCK_24;
             LCD_puts_f(PSTR("24H"), 1);	// mt LCD_puts("24H", 1);
         }
-        else
-        {
+        else {
             clockformat = CLOCK_12;
             LCD_puts_f(PSTR("12H"), 1);   // mt LCD_puts("12H", 1);            
         }
     }
-    else if (input == KEY_ENTER)    
-    {
+    else if (input == KEY_ENTER) {
         enter = 1;
         return ST_TIME_CLOCK_FUNC;
     }        
@@ -435,15 +437,18 @@ uint8_t ShowDate(uint8_t input)
 
     LCD_Colon(1);
 
-    LCD_UpdateRequired(TRUE, 0);
+    LCD_UpdateRequired(true, 0);
 
 
-    if (input == KEY_PREV)
+    if (input == KEY_PREV) {
         return ST_TIME_DATE;
-    else if (input == KEY_NEXT)
+    }
+    else if (input == KEY_NEXT) {
         return ST_TIME_DATE_ADJUST;
-    else   
+    }
+    else {
         return ST_TIME_DATE_FUNC;
+    }
 }
 
 #define YEAR        0
@@ -465,26 +470,19 @@ uint8_t ShowDate(uint8_t input)
 uint8_t SetDate(uint8_t input)
 {
 	static uint8_t enter_function = 1;
-	// static char date[3];    // table holding the temporary date setting
-	// static char mode = DAY;
-	// char YH, YL, MH, ML, DH, DL;
-	// char MonthLength_temp;
-	// char LeapMonth;
 	static uint8_t date[3];    // table holding the temporary date setting
 	static uint8_t mode = DAY;
 	uint8_t YH, YL, MH, ML, DH, DL;
 	uint8_t MonthLength_temp;
 
-    if (enter_function)
-    {
+    if (enter_function) {
         uint16_t year;
 
         GetDate(&year, &date[MONTH], &date[DAY]);
         date[YEAR] = year;
     }
 
-    if (mode == YEAR)
-    {
+    if (mode == YEAR) {
         YH = CHAR2BCD2(date[YEAR]);
         YL = (YH & 0x0F) + '0';
         YH = (YH >> 4) + '0';
@@ -496,8 +494,7 @@ uint8_t SetDate(uint8_t input)
         LCD_putc( 4, YH);
         LCD_putc( 5, YL);
     }
-    else if (mode == MONTH)
-    {
+    else if (mode == MONTH) {
         MH = CHAR2BCD2(date[MONTH]);
         ML = (MH & 0x0F) + '0';
         MH = (MH >> 4) + '0';
@@ -509,8 +506,7 @@ uint8_t SetDate(uint8_t input)
         LCD_putc( 4, MH);
         LCD_putc( 5, ML);
     }
-    else if (mode == DAY)
-    {
+    else if (mode == DAY) {
         DH = CHAR2BCD2(date[DAY]);
         DL = (DH & 0x0F) + '0';
         DH = (DH >> 4) + '0';
@@ -527,35 +523,39 @@ uint8_t SetDate(uint8_t input)
 
     LCD_Colon(0);
 
-    if (input != KEY_NULL)
+    if (input != KEY_NULL) {
         LCD_FlashReset();
+    }
 
-    LCD_UpdateRequired(TRUE, 0);
+    LCD_UpdateRequired(true, 0);
 
 
     enter_function = 1;
 
     // Increment/decrement years, months or days
-    if (input == KEY_PLUS)
+    if (input == KEY_PLUS) {
         date[mode]++;
-    else if (input == KEY_MINUS)
+    }
+    else if (input == KEY_MINUS) {
         date[mode]--;
-    else if (input == KEY_PREV)
-    {
-        if (mode == YEAR)
+    }
+    else if (input == KEY_PREV) {
+        if (mode == YEAR) {
             mode = DAY;
-        else
+        }
+        else {
             mode--;
+        }
     }
-    else if (input == KEY_NEXT)
-    {
-        if (mode == DAY)
+    else if (input == KEY_NEXT) {
+        if (mode == DAY) {
             mode = YEAR;
-        else
+        }
+        else {
             mode++;
+        }
     }
-    else if (input == KEY_ENTER)
-    {
+    else if (input == KEY_ENTER) {
         // store the temporary adjusted values to the global variables
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
         {
@@ -568,23 +568,29 @@ uint8_t SetDate(uint8_t input)
     }
 
     /* OPTIMIZE: Can be solved by using a modulo operation */
-    if (date[YEAR] == 255)
+    if (date[YEAR] == 255) {
         date[YEAR] = 99;
-    if (date[YEAR] > 99)
+    }
+    if (date[YEAR] > 99) {
         date[YEAR] = 0;
+    }
 
-    if (date[MONTH] == 0)
+    if (date[MONTH] == 0) {
         date[MONTH] = 12;
-    if (date[MONTH] > 12)
+    }
+    if (date[MONTH] > 12) {
         date[MONTH] = 1;
+    }
 
     // number of days of the month that is being set (leap years included)
     MonthLength_temp = days_in_month(date[YEAR], date[MONTH]);
     
-    if (date[DAY] == 0)
+    if (date[DAY] == 0) {
         date[DAY] = MonthLength_temp;
-    if (date[DAY] > MonthLength_temp)
+    }
+    if (date[DAY] > MonthLength_temp) {
         date[DAY] = 1;
+    }
 
     enter_function = 0;
     
@@ -609,32 +615,32 @@ uint8_t SetDateFormat(uint8_t input)
 {
     static uint8_t enter = 1;
 
-    if(enter)
-    {
+    if(enter) {
         enter = 0;
 
         LCD_puts_f(DATEFORMAT_TEXT[dateformat], 1);
     }
-    if (input == KEY_PLUS)
-    {
-        if(dateformat >= 2)
+    if (input == KEY_PLUS) {
+        if(dateformat >= 2) {
             dateformat = 0;
-        else
+        }
+        else {
             dateformat++;
+        }
 
         LCD_puts_f(DATEFORMAT_TEXT[dateformat], 1);        
     }
-    else if (input == KEY_MINUS)
-    {
-        if(dateformat == 0)
+    else if (input == KEY_MINUS) {
+        if(dateformat == 0) {
             dateformat = 2;
-        else
+        }
+        else {
             dateformat--;
+        }
             
         LCD_puts_f(DATEFORMAT_TEXT[dateformat], 1);            
     }
-    else if (input == KEY_ENTER)    
-    {
+    else if (input == KEY_ENTER) {
         enter = 1;
         return ST_TIME_DATE_FUNC;
     }        
@@ -653,32 +659,27 @@ ISR(TIMER2_OVF_vect)
 {
     gSECOND++;               // increment second
 
-    if (gSECOND == 60)
-    {
+    if (gSECOND == 60) {
         gSECOND = 0;
         gMINUTE++;
         
         gPowerSaveTimer++;
         
-        if (gMINUTE > 59)
-        {
+        if (gMINUTE > 59) {
             gMINUTE = 0;
             gHOUR++;
             
-            if (gHOUR > 23)
-            {
+            if (gHOUR > 23) {
                 
                 gHOUR = 0;
                 gDAY++;
 
                 // Now, we can check for month length
-                if (gDAY > days_in_month(gYEAR, gMONTH))
-                {
+                if (gDAY > days_in_month(gYEAR, gMONTH)) {
                     gDAY = 1;
                     gMONTH++;
 
-                    if (gMONTH > 12)
-                    {
+                    if (gMONTH > 12) {
                         gMONTH = 1;
                         gYEAR++;
                     }

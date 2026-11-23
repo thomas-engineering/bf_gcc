@@ -7,7 +7,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: avr-gcc / avr-libc
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly USART routines
 //
@@ -18,6 +18,8 @@
 //  20030116 - 1.0  - Created                                       - LHM
 //  2004            - corrected comment (only receiver enabled)     - mt
 //  20070517        - option to enable transmit                     - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
+//
 //***************************************************************************
 
 #include <avr/io.h>
@@ -74,7 +76,9 @@ void USART_Init(uint16_t baudrate)
 #ifdef WITH_TRANSMIT
 void Usart_Tx(char data)
 {
-    while (!(UCSRA & (1<<UDRE)));
+    while (!(UCSRA & (1<<UDRE))) { 
+        // Wait for empty transmit buffer
+    };
     UDR = data;
 }
 #endif
@@ -93,6 +97,8 @@ void Usart_Tx(char data)
 *****************************************************************************/
 char Usart_Rx(void)
 {
-    while (!(UCSRA & (1<<RXC)));
+    while (!(UCSRA & (1<<RXC))) {
+        // Wait for data to be received
+    };
     return UDR;
 }

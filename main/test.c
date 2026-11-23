@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 3.3.1; avr-libc 1.0
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly TEST routines
 //
@@ -17,6 +17,7 @@
 //  20030116 - 1.0  - Created                                       - LHM
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20060107          TestWaitEnter()                               - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -145,7 +146,7 @@ void Test(void)
 
     // The LCD interrupt only writes the digits and the colon (no RAM copy of
     // all registers any more), so clear the 0xFF test pattern here.
-    LCD_AllSegments(FALSE);
+    LCD_AllSegments(false);
 
     sbiBF(LCDCRA, LCDIE);
 
@@ -157,13 +158,12 @@ void Test(void)
     integer = ADC_read();
     
     //check if temperature is between 21 and 30 degree Celcius
-    if( (integer < 452) || (integer > 586) )  
-    {
+    if( (integer < 452) || (integer > 586) ) {
         LCD_puts_f(PSTR("Error Temperature"),0);// mt LCD_puts("Error Temperature",0);
         ErrorBeep();
         TestWaitEnter();
         ADC_periphery();
-        LCD_UpdateRequired(TRUE, 0);
+        LCD_UpdateRequired(true, 0);
         TestWaitEnter();
     }
 
@@ -174,13 +174,12 @@ void Test(void)
     integer = ADC_read();
 
     //if measuring outside 4,8 to 5,2 V
-    if( (integer < 298) || (integer > 320) )
-    {
+    if( (integer < 298) || (integer > 320) ) {
         LCD_puts_f(PSTR("Error Voltage"),0);// mt LCD_puts("Error Voltage",0);
         ErrorBeep();
         TestWaitEnter();
         ADC_periphery();
-        LCD_UpdateRequired(TRUE, 0);
+        LCD_UpdateRequired(true, 0);
         TestWaitEnter();
     }
 
@@ -198,7 +197,7 @@ void Test(void)
         ADC_read();
         ADC_periphery();
         asm volatile ("nop"::);
-        LCD_UpdateRequired(TRUE, 0);    
+        LCD_UpdateRequired(true, 0);    
         input = getkey();           // Read buttons
     }
 
@@ -220,8 +219,7 @@ void Test(void)
     for(j=0;j<50;j++)
     {
         
-        if(j != DF_SPI_RW(0x00) )
-        {
+        if(j != DF_SPI_RW(0x00) ) {
             LCD_puts_f(PSTR("Error DataFlash"),0);// mt LCD_puts("Error Dataflash",0);
             ErrorBeep();
             TestWaitEnter();

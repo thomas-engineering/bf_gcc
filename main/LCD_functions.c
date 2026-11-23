@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: Additional LCD functions, scrolling text and write data
 //
@@ -19,6 +19,7 @@
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20070131          gLCD_Start_Scroll_Timer volatile              - mt
 //  20070517          LCDClear, gTextBuffer[0] to 0-char            - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //*****************************************************************************
 
 //  Include files
@@ -69,19 +70,17 @@ void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode)
 
     gTextBuffer[i] = LCD_CODE_END;
 
-    if (i > 6)
-    {
+    if (i > 6) {
         gScrollMode = 1;        // Scroll if text is longer than display size
         gScroll = 0;
         gLCD_Start_Scroll_Timer = 3;    //Start-up delay before scrolling the text
     }
-    else
-    {
+    else {
         gScrollMode = 0;        
         gScroll = 0;
     }
 
-    gLCD_Update_Required = 1;
+    gLCD_Update_Required = true;
 }
 
 
@@ -111,19 +110,17 @@ void LCD_puts(char *pStr, uint8_t scrollmode)
 
     gTextBuffer[i] = LCD_CODE_END;
 
-    if (i > 6)
-    {
+    if (i > 6) {
         gScrollMode = 1;        // Scroll if text is longer than display size
         gScroll = 0;
         gLCD_Start_Scroll_Timer = 3;    //Start-up delay before scrolling the text
     }
-    else
-    {
+    else {
         gScrollMode = 0;        
         gScroll = 0;
     }
 
-    gLCD_Update_Required = 1;
+    gLCD_Update_Required = true;
 }
 
 
@@ -142,8 +139,9 @@ void LCD_puts(char *pStr, uint8_t scrollmode)
 // mt void LCD_putc(char digit, char character)
 void LCD_putc(uint8_t digit, char character)
 {
-    if (digit < TEXTBUFFER_SIZE)
+    if (digit < TEXTBUFFER_SIZE) {
         gTextBuffer[digit] = LCD_CharToCode(character);
+    }
 }
 
 
@@ -162,8 +160,9 @@ void LCD_Clear(void)
 {
     uint8_t i; // char i;
 
-    for (i=0; i<TEXTBUFFER_SIZE; i++)
+    for (i=0; i<TEXTBUFFER_SIZE; i++) {
         gTextBuffer[i] = LCD_CODE_BLANK;
+    }
 
     gTextBuffer[0] = LCD_CODE_END; // mt 5/2007
 }
@@ -175,12 +174,12 @@ void LCD_Clear(void)
 *
 *	Returns :		None
 *
-*	Parameters :	show: Enables the colon if TRUE, disable if FALSE
+*	Parameters :	show: Enables the colon if true, disable if false
 *
 *	Purpose :		Enable/disable colons on the LCD
 *
 *****************************************************************************/
-void LCD_Colon(uint8_t show)
+void LCD_Colon(bool show)
 {
     gColon = show;
 }
@@ -192,13 +191,13 @@ void LCD_Colon(uint8_t show)
 *
 *	Returns :		None
 *
-*	Parameters :	update: TRUE/FALSE
+*	Parameters :	update: true/false
 *                   scrollmode: not in use
 *
 *	Purpose :		Tells the LCD that there is new data to be presented
 *
 *****************************************************************************/
-void LCD_UpdateRequired(uint8_t update, uint8_t scrollmode)
+void LCD_UpdateRequired(bool update, uint8_t scrollmode)
 {
 
     while (gLCD_Update_Required);
@@ -244,8 +243,7 @@ uint8_t SetContrast(uint8_t input)
     static uint8_t enter = 1;
     uint8_t CH, CL;
 
-    if (enter)
-    {
+    if (enter) {
         LCD_Clear();
         enter = 0;
     }
@@ -261,23 +259,26 @@ uint8_t SetContrast(uint8_t input)
     LCD_putc(4, CH);
     LCD_putc(5, CL);
 
-    LCD_UpdateRequired(TRUE, 0);
+    LCD_UpdateRequired(true, 0);
 
-    if (input == KEY_PLUS)
+    if (input == KEY_PLUS) {
         CONTRAST++;
-    else if (input == KEY_MINUS)
+    }
+    else if (input == KEY_MINUS) {
         CONTRAST--;
+    }
 
-    if (CONTRAST == 255)
+    if (CONTRAST == 255) {
         CONTRAST = 0;
-    if (CONTRAST > 15)
+    }
+    if (CONTRAST > 15) {
         CONTRAST = 15;
+    }
 
     LCD_CONTRAST_LEVEL(CONTRAST);
 
 
-    if (input == KEY_ENTER)
-    {
+    if (input == KEY_ENTER) {
         enter = 1;
         return ST_OPTIONS_DISPLAY_CONTRAST;
     }

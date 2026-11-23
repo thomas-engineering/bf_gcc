@@ -1,8 +1,11 @@
+#ifndef ADC_H_
+#define ADC_H_
+
 #define TEMPERATURE_SENSOR  0
 #define VOLTAGE_SENSOR      1
 #define LIGHT_SENSOR        2
 #define CELSIUS             3
-#define FAHRENHEIT           4
+#define FAHRENHEIT          4
 
 void ADC_init(uint8_t );
 uint16_t ADC_read(void);
@@ -22,3 +25,5 @@ uint8_t VoltageFunc(uint8_t);
 
 // Light sensor function
 uint8_t LightFunc(uint8_t);
+
+#endif /* ADC_H_ */

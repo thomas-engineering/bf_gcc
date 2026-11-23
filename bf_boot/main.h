@@ -1,3 +1,6 @@
+#ifndef BOOT_MAIN_H_
+#define BOOT_MAIN_H_
+
 // mt: removed all definitions but mega169
 //  added mega16 since mega169 is not supported by AVRPROG V1.37
 
@@ -62,3 +65,5 @@
 
 #define TRUE    1
 #define FALSE   0
+
+#endif /* BOOT_MAIN_H_ */

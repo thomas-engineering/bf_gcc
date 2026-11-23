@@ -7,7 +7,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 3.3.1; avr-libc 1.0
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly ADC routines
 //
@@ -17,6 +17,7 @@
 //
 //  20030116 - 1.0  - Created                                       - LHM
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -76,7 +77,7 @@ const __flash float LIGHT_VOLTAGE[] = // Vref table correspondent to the LIGHT_A
 
 
 float Vref = 2.900; // initial value
-uint8_t degree = CELSIUS; // char degree = CELCIUS;
+uint8_t degree = CELSIUS; 
 
 
 /*****************************************************************************
@@ -97,7 +98,7 @@ void ADC_init(uint8_t input)
     
     ADCSRA = (1<<ADEN) | (1<<ADPS1) | (1<<ADPS0);    // set ADC prescaler to , 1MHz / 8 = 125kHz    
 
-    input = ADC_read();        // dummy 
+    input = ADC_read();        // dummy-read
 }
 
 
@@ -116,7 +117,6 @@ uint16_t ADC_read(void)
 {
     uint8_t i;
     uint16_t ADC_temp;
-    // mt int ADC = 0 ;
     uint16_t ADCr = 0;
     
     // To save power, the voltage over the LDR and the NTC is turned off when not used
@@ -192,8 +192,9 @@ void ADC_Service(void)
         ADC_Pending = 0;
     }
 
-    if (pending)
+    if (pending) {
         ADC_periphery();
+    }
 }
 
 
@@ -226,38 +227,29 @@ void ADC_periphery(void)
     
     ADCresult = ADC_read();         // Find the ADC value
      
-    if( ADMUX == TEMPERATURE_SENSOR )
-    {
-        if(degree == CELSIUS)
-        {
-            if(ADCresult > 810)         // If it's a negtive temperature
-            {    
+    if( ADMUX == TEMPERATURE_SENSOR ) {
+        if(degree == CELSIUS) {
+            if(ADCresult > 810) { // If it's a negtive temperature    
                 for (i=0; i<=25; i++)   // Find the temperature
                 {
-                    // mt if (ADCresult <= TEMP_Celcius_neg[i])
-                    if (ADCresult <= TEMP_Celsius_neg[i])
-                    {
+                    if (ADCresult <= TEMP_Celsius_neg[i]) {
                         break;
                     }
                 }
                 
                 LCD_putc(1, '-');       // Put a minus sign in front of the temperature
             }
-            else if (ADCresult < 800)   // If it's a positive temperature
-            {
+            else if (ADCresult < 800) { // If it's a positive temperature
                 for (i=0; i<100; i++)  
                 {
-                    // mt if (ADCresult >= TEMP_Celcius_pos[i])
-                    if (ADCresult >= TEMP_Celsius_pos[i])
-                    {
+                    if (ADCresult >= TEMP_Celsius_pos[i]) {
                         break;
                     }
                 }        
             
                 LCD_putc(1, '+');       // Put a plus sign in front of the temperature
             }
-            else                        //If the temperature is zero degrees
-            {
+            else { //If the temperature is zero degrees
                 i = 0;
                 LCD_putc(1, ' ');
             }
@@ -275,27 +267,22 @@ void ADC_periphery(void)
             LCD_putc(5, 'C');
             LCD_putc(6, '\0');
         }
-        else if (degree == FAHRENHEIT)
-        {
+        else if (degree == FAHRENHEIT) {
             for (i=0; i<=141; i++)   // Find the temperature
             {
-                // mt if (ADCresult > TEMP_Farenheit_pos[i])
-                if (ADCresult > TEMP_Fahrenheit_pos[i])
-                {
+                if (ADCresult > TEMP_Fahrenheit_pos[i]) {
                     break;
                 }
             }        
         
             Temp_int = CHAR2BCD3(i);
         
-            if (i > 99) // if there are three digits
-            {
+            if (i > 99) { // if there are three digits
                 LCD_putc(0, '+');
                 TH = (Temp_int >> 8) + '0';   // Find the high-byte
                 LCD_putc(1, TH);
             }
-            else    // if only two digits
-            {
+            else { // if only two digits
                 LCD_putc(0, ' ');
                 LCD_putc(1, '+');
             }
@@ -312,8 +299,7 @@ void ADC_periphery(void)
         }
 
     }
-    else if( ADMUX == VOLTAGE_SENSOR )
-    {
+    else if( ADMUX == VOLTAGE_SENSOR ) {
         //  Do a Light-measurement first to determine the Vref, 
         //  because the LDR affects the Vref 
 
@@ -326,18 +312,17 @@ void ADC_periphery(void)
         // Find Vref
         for (i=0; i<=22; i++)
         {
-            // mt if (ADCresult <= LIGHT_ADC[i])
-            if (ADCresult <= LIGHT_ADC[i])
-            {
+            if (ADCresult <= LIGHT_ADC[i]) {
                 break;
             }
         }
-        if(!i)              // if it's very bright
+        if(!i) { // if it's very bright
             Vref = 2.815;
-        else if(i >= 21)
+        }
+        else if(i >= 21) {
             Vref = 2.942;   // if it's totally dark
+        }
         else {
-            // mt: Vref = LIGHT_VOLTAGE[i];   
             Vref = LIGHT_VOLTAGE[i];
         }
           
@@ -373,8 +358,7 @@ void ADC_periphery(void)
         
                              
     }
-    else if( ADMUX == LIGHT_SENSOR )
-    {
+    else if( ADMUX == LIGHT_SENSOR ) {
         // The relation between ADC-value and lux is yet to be found, 
         // for now the ADC-value is presented on the LCD
         
@@ -383,12 +367,14 @@ void ADC_periphery(void)
         Temp = ADCL;                
     
         TL = (Temp & 0x0F) + '0';       
-        if(TL > '9')        // if the hex-value is over 9, add 7 in order to go 
+        if(TL > '9') { // if the hex-value is over 9, add 7 in order to go
             TL += 7;        // jump to the character in the ASCII-table
+        }
                 
         TH = (Temp >> 4) + '0';
-        if(TH > '9')        // if the hex-value is over 9, add 7 in order to go 
+        if(TH > '9') { // if the hex-value is over 9, add 7 in order to go
             TH += 7;        // jump to the character in the ASCII-table
+        }
             
         LCD_putc(0, 'A');
         LCD_putc(1, 'D');
@@ -417,8 +403,7 @@ uint8_t TemperatureFunc(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if (enter)
-    {
+    if (enter) {
         enter = 0;
         
         ADC_init(TEMPERATURE_SENSOR);       // Init the ADC
@@ -427,11 +412,11 @@ uint8_t TemperatureFunc(uint8_t input)
         // (it will actually be more than 10ms cause of the SLEEP)
         ADC_StartAuto();
     }
-    else
-        LCD_UpdateRequired(TRUE, 0);        // New data to be presented
+    else {
+        LCD_UpdateRequired(true, 0);        // New data to be presented
+    }
     
-    if (input == KEY_PREV)
-    {
+    if (input == KEY_PREV) {
         // Disable the auto-run of the ADC_periphery
         ADC_StopAuto();
         
@@ -439,19 +424,21 @@ uint8_t TemperatureFunc(uint8_t input)
         
         return ST_TEMPERATURE;
     }
-    else if (input == KEY_PLUS)
-    {   
-        if (degree == FAHRENHEIT)
+    else if (input == KEY_PLUS) {   
+        if (degree == FAHRENHEIT) {
             degree = CELSIUS;
-        else
+        }
+        else {
             degree = FAHRENHEIT;
+        }
     }
-    else if (input == KEY_MINUS)
-    {
-        if (degree == FAHRENHEIT)
+    else if (input == KEY_MINUS) {
+        if (degree == FAHRENHEIT) {
             degree = CELSIUS;
-        else
+        }
+        else {
             degree = FAHRENHEIT;
+        }
     }
     
     return ST_TEMPERATURE_FUNC;
@@ -473,8 +460,7 @@ uint8_t VoltageFunc(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if (enter)
-    {
+    if (enter) {
         enter = 0;
 
         ADC_init(VOLTAGE_SENSOR);       // Init the ADC
@@ -483,11 +469,11 @@ uint8_t VoltageFunc(uint8_t input)
         // (it will actually be more than 10ms cause of the SLEEP)        
         ADC_StartAuto();
     }
-    else
-        LCD_UpdateRequired(TRUE, 0); 
+    else {
+        LCD_UpdateRequired(true, 0); 
+    }
 
-    if (input == KEY_PREV)
-    {
+    if (input == KEY_PREV) {
         // Disable the auto-run of the ADC_periphery        
         ADC_StopAuto();
         
@@ -495,8 +481,9 @@ uint8_t VoltageFunc(uint8_t input)
         
         return ST_VOLTAGE;
     }
-    else
+    else {
         return ST_VOLTAGE_FUNC;    
+    }
 }
 
 
@@ -515,8 +502,7 @@ uint8_t LightFunc(uint8_t input)
 {
     static uint8_t enter = 1;
     
-    if (enter)
-    {
+    if (enter) {
     
         enter = 0;
         
@@ -526,11 +512,11 @@ uint8_t LightFunc(uint8_t input)
         // (it will actually be more than 10ms cause of the SLEEP)  
         ADC_StartAuto();
     }
-    else
-        LCD_UpdateRequired(TRUE, 0); 
+    else {
+        LCD_UpdateRequired(true, 0); 
+    }
 
-    if (input == KEY_PREV)
-    {
+    if (input == KEY_PREV) {
         // Disable the auto-run of the ADC_periphery      
         ADC_StopAuto();
         
@@ -538,6 +524,7 @@ uint8_t LightFunc(uint8_t input)
     
         return ST_LIGHT;
     }
-    else
+    else {
         return ST_LIGHT_FUNC;    
+    }
 }

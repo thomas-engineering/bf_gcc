@@ -1,3 +1,7 @@
+#ifndef TIMER0_H_
+#define TIMER0_H_
+
+#include <stdbool.h>
 
 // Typedef for Timer callback function 
 typedef void (*TIMER_CALLBACK_FUNC) (void);
@@ -7,13 +11,12 @@ typedef void (*TIMER_CALLBACK_FUNC) (void);
 
 void Timer0_Init(void);
 
-BOOL Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc);
-BOOL Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc);
+bool Timer0_RegisterCallbackFunction(TIMER_CALLBACK_FUNC pFunc);
+bool Timer0_RemoveCallbackFunction(TIMER_CALLBACK_FUNC pFunc);
 
-
-//mt 
-// char Timer0_AllocateCountdownTimer();
 uint8_t Timer0_AllocateCountdownTimer(void);
 uint8_t Timer0_GetCountdownTimer(uint8_t timer);
 void Timer0_SetCountdownTimer(uint8_t timer, uint8_t value);
 void Timer0_ReleaseCountdownTimer(uint8_t timer);
+
+#endif /* TIMER0_H_ */

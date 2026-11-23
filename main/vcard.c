@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: avr-gcc 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly Name-tag
 //
@@ -20,6 +20,7 @@
 //  20060106          fixed length-check in vCard()                 - mt
 //  20070129          using avr-libc's eeprom.h                     - mt
 //  20070517          avoid buffer-overflows, EnterName modified    - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -36,15 +37,11 @@
 #include "vcard.h"
 
 
-uint8_t gUART = FALSE;
-
+bool gUART = false;
 // mt s/index/indexps
-//char index = 0;         //variable to keep the lenght of the present string
 uint8_t indexps = 0;
 char Name[STRLENGTH + 1];    // +1: room for the terminator of a full-length name
 
-// mt: jw method used 
-/// const char TEXT_WAIT[] PROGMEM                = "waiting for input on RS232";
 
 /*****************************************************************************
 *
@@ -61,19 +58,16 @@ uint8_t vCard(uint8_t input)
 {
 	static uint8_t enter = 1;
 
-	if (enter)
-	{
+	if (enter) {
 		indexps=eeprom_read_byte(&EEPROM_VCARD->length);
 
-		if((indexps < 1) || (indexps > STRLENGTH))   // if illegal length / mt: fixed, was: |    
-		{
+		if((indexps < 1) || (indexps > STRLENGTH)) { // if illegal length / mt: fixed, was: |
 			indexps = 0;
 			Name[0] = 'A';
 			enter = 1;
 			return ST_VCARD_ENTER_NAME;               //enter new name
 		}
-		else
-		{
+		else {
 			LoadEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  // Load name 
 			Name[indexps] = '\0';   // EEPROM holds no terminator
 			LCD_puts(Name, 1);
@@ -81,13 +75,11 @@ uint8_t vCard(uint8_t input)
 		}
 	}
 
-	else if (input == KEY_NEXT)
-	{
+	else if (input == KEY_NEXT) {
 		enter = 1;
 		return ST_VCARD_ENTER_NAME;
 	}
-	else if (input == KEY_PREV)
-	{
+	else if (input == KEY_PREV) {
 		enter = 1;
 		return ST_VCARD;
 	}
@@ -117,8 +109,7 @@ uint8_t EnterName(uint8_t input)
 	uint8_t i, temp_index;
 	char c, c_out;
 
-	if (enter)
-	{
+	if (enter) {
 		LoadEEPROM(Name, indexps, (uint8_t *)EEPROM_VCARD->name);  // Load name from EEPROM
 
 		if(indexps) {
@@ -126,8 +117,7 @@ uint8_t EnterName(uint8_t input)
 		}
 		enter = 0;
 	}
-	else
-	{
+	else {
 		// copy the tailing characters of Name to LCD
 		temp_index = indexps+1;
 		for( i = 6; i > 0; i-- ) {
@@ -156,59 +146,60 @@ uint8_t EnterName(uint8_t input)
 		if (input != KEY_NULL) {
 			LCD_FlashReset();
 		}
-		LCD_UpdateRequired(TRUE, 0);
+		LCD_UpdateRequired(true, 0);
 	}
 
 	if (input != KEY_NULL) {
 		LCD_FlashReset();
 	}
 
-	if ( input == KEY_MINUS ) // mt 1/06 (input == KEY_PLUS)
-	{
+	if ( input == KEY_MINUS ) { // mt 1/06 (input == KEY_PLUS)
 		Name[indexps]--;
 		
 		c = Name[indexps];
-		if( (('!' <= c) && (c <= '/')) && (c != ' '))
+		if( (('!' <= c) && (c <= '/')) && (c != ' ')) {
 			Name[indexps] = ' ';
-		else if((':' <= c) && (c <= '@'))
+		}
+		else if((':' <= c) && (c <= '@')) {
 			Name[indexps] = '9';
-		else if(c >= '[')
+		}
+		else if(c >= '[') {
 			Name[indexps] = 'Z';
-		else if(c < ' ')
+		}
+		else if(c < ' ') {
 			Name[indexps] = 'Z';
+		}
 	}
-	else if ( input == KEY_PLUS ) // mt 1/06 (input == KEY_MINUS)
-	{
+	else if ( input == KEY_PLUS ) { // mt 1/06 (input == KEY_MINUS)
 		Name[indexps]++;
 		
 		c = Name[indexps];
-		if( (('!' <= c) && (c <= '/')) && (c != ' '))
+		if( (('!' <= c) && (c <= '/')) && (c != ' ')) {
 			Name[indexps] = '0';
-		else if( (':' <= c) && (c <= '@'))
+		}
+		else if( (':' <= c) && (c <= '@')) {
 			Name[indexps] = 'A';
-		else if(c >= '[')
+		}
+		else if(c >= '[') {
 			Name[indexps] = ' ';
-		else if(c < ' ')
+		}
+		else if(c < ' ') {
 			Name[indexps] = ' ';
+		}
 	}
-	else if (input == KEY_PREV)
-	{
-		if(indexps)
-		{
+	else if (input == KEY_PREV) {
+		if(indexps) {
 			indexps--;
 		}
 	}
-	else if (input == KEY_NEXT)
-	{
-		if(indexps < STRLENGTH-1) // mt 5/2007: -1
-		{
+	else if (input == KEY_NEXT) {
+		if(indexps < STRLENGTH-1) { // mt 5/2007: -1
 			i = Name[indexps]; // ext. mt 1/2006
 			indexps++;
 			Name[indexps] = i; // Name[indexps] = 'A';
 		}
 	}
-	else if (input == KEY_ENTER)
-	{
+	else if (input == KEY_ENTER) {
 		indexps++;
 		Name[indexps] = '\0';
 
@@ -242,8 +233,7 @@ uint8_t RS232(uint8_t input)
     //static char temp_index;
     static uint8_t temp_index;
     
-    if (enter)
-    {
+    if (enter) {
         // boost IntRC to 2Mhz to achieve 19200 baudrate
         SetClockPrescaler(CLOCK_2MHZ);
         
@@ -252,26 +242,24 @@ uint8_t RS232(uint8_t input)
         enter = 0;
         temp_index = 0;
         c = UDR;                       // Dummy read to clear receive buffer
-        gUART = TRUE;
+        gUART = true;
     }
 
-    if (UCSRA & (1<<RXC))
-    {
+    if (UCSRA & (1<<RXC)) {
         c = UDR;
-        if (c != '\r')
-        {
-            if (temp_index < STRLENGTH-1) // mt 5/2007: -1
+        if (c != '\r') {
+            if (temp_index < STRLENGTH-1) { // mt 5/2007: -1
                 buffer[temp_index++] = c;
+            }
         }
-        else    // UART transmission completed
-        {
+        else { // UART transmission completed
             SetClockPrescaler(CLOCK_1MHZ);
                 
-            if(temp_index)
-            {
+            if(temp_index) {
                 buffer[temp_index] = '\0';
-                for (temp_index = 0; buffer[temp_index]; temp_index++)
+                for (temp_index = 0; buffer[temp_index]; temp_index++) {
                     Name[temp_index] = buffer[temp_index];
+                }
                 Name[temp_index] = '\0';
                 
                 enter = 1;
@@ -281,11 +269,10 @@ uint8_t RS232(uint8_t input)
                 
                 indexps = temp_index;
                 
-                gUART = FALSE;
+                gUART = false;
                 return ST_VCARD_FUNC;
             }
-            else    // if no characters received 
-            {
+            else { // if no characters received
                 enter = 1;
                 return ST_VCARD_DOWNLOAD_NAME;
             }
@@ -293,13 +280,12 @@ uint8_t RS232(uint8_t input)
     }
 
 
-    if (input != KEY_NULL)
-    {
+    if (input != KEY_NULL) {
         enter = 1;
         
         SetClockPrescaler(CLOCK_1MHZ);
         
-        gUART = FALSE;
+        gUART = false;
         return ST_VCARD_DOWNLOAD_NAME;
     }
 

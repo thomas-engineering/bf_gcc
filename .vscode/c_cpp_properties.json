@@ -13,7 +13,8 @@
             ],
             "defines": [
                 "__AVR_ATmega169__",
-                "F_CPU=1000000UL"
+                "F_CPU=1000000UL",
+                "__flash="
             ],
             "compilerArgs": [
                 "-mmcu=atmega169"

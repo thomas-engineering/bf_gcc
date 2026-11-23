@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: AVR Butterfly sound routines
 //
@@ -20,6 +20,7 @@
 //  20050727          added local helper-function                   - mt
 //  20060107          fixed or in pause-if                          - mt
 //  20070605          added song                                    - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //***************************************************************************
 
@@ -35,13 +36,209 @@
 #include "LCD_functions.h"
 #include "button.h"
 
+#define DURATION_SEED 32
+
+
+/*****************************************************************************
+*
+*   Tone definition. Each tone are set up with a value which will give the
+*   right frequency when applied to a 16-bits timer with PWM. These values are based
+*   on a CLKcpu running @ 1Mhz.
+*
+*   First find the frequency for all tones.
+*
+*   Formula:    ToneX = Bf * 2^(ToneX/12)
+*
+*   ToneX: the actual tone, e.g. C0 = 3
+*   Bf: Basefrequency = 220Hz (A)
+*
+*
+*   E.g: For tone C0 this would be:     C0 = 220 * 2^(3/12)
+*                                       C0 = 261,6256...
+*
+*   Now we must find which value to put in a 16-bits timer with PWM to achieve
+*   this frequency
+*
+*   Formula:    Timer value = 1Mhz / ToneHz / 2
+*
+*   E.g: For tone C0 this would be:     Timer value = 1000000 / 261,6256... / 2
+*                                       Timer value = 1911
+*
+*   Set up a 16-bits timer to run at Phase/Freq-correct PWM, top value = ICR1,
+*   set OC1A when upcounting, clear when downcounting.
+*
+*****************************************************************************/
+
+#define A   2273        // tone 0
+#define xA  2145        // tone 1
+#define Ax  2145        // tone 1
+#define B   2025        // tone 2
+#define C0  1911        // tone 3
+#define xC0 1804        // ...
+#define Cx0 1804
+#define D0  1703
+#define xD0 1607
+#define Dx0 1607
+#define E0  1517
+#define F0  1432
+#define xF0 1351
+#define Fx0 1351
+#define G0  1275
+#define xG0 1204
+#define Gx0 1204
+#define A0  1136
+#define xA0 1073
+#define Ax0 1073
+#define B0  1012
+#define C1  956
+#define xC1 902
+#define Cx1 902
+#define D1  851
+#define xD1 804
+#define Dx1 804
+#define E1  758
+#define F1  716
+#define xF1 676
+#define Fx1 676
+#define G1  638
+#define xG1 602
+#define Gx1 602
+#define A1  568
+#define xA1 536
+#define Ax1 536
+#define B1  506
+#define C2  478
+#define xC2 451
+#define Cx2 451
+#define D2  426
+#define xD2 402
+#define Dx2 402
+#define E2  379
+#define F2  356
+#define xF2 338
+#define Fx2 338
+#define G2  319
+#define xG2 301
+#define Gx2 301
+#define A2  284
+#define xA2 268
+#define Ax2 268
+#define B2  253
+#define C3  239
+#define xC3 225
+#define Cx3 225
+#define D3  213
+#define xD3 201
+#define Dx3 201
+#define E3  190
+#define F3  179
+#define xF3 169
+#define Fx3 169
+#define G3  159
+#define xG3 150
+#define Gx3 150
+#define A3  142
+#define xA3 134
+#define Ax3 134
+#define B3  127
+#define C4  119
+
+
+#define P   1           // pause
+
+
+
+/******************************************************************************
+*
+*   The tone definitions are duplicated to accept both upper and lower case
+*
+******************************************************************************/
+
+#define a   2273        // tone 0
+#define xa  2145        // tone 1
+#define ax  2145        // tone 1
+#define b   2024        // tone 2
+#define c0  1911        // tone 3
+#define xc0 1804        // ...
+#define cx0 1804
+#define d0  1703
+#define xd0 1607
+#define dx0 1607
+#define e0  1517
+#define f0  1432
+#define xf0 1351
+#define fx0 1351
+#define g0  1275
+#define xg0 1204
+#define gx0 1204
+#define a0  1136
+#define xa0 1073
+#define ax0 1073
+#define b0  1012
+#define c1  956
+#define xc1 902
+#define cx1 902
+#define d1  851
+#define xd1 804
+#define dx1 804
+#define e1  758
+#define f1  716
+#define xf1 676
+#define fx1 676
+#define g1  638
+#define xg1 602
+#define gx1 602
+#define a1  568
+#define xa1 536
+#define ax1 536
+#define b1  506
+#define c2  478
+#define xc2 451
+#define cx2 451
+#define d2  426
+#define xd2 402
+#define dx2 402
+#define e2  379
+#define f2  356
+#define xf2 338
+#define fx2 338
+#define g2  319
+#define xg2 301
+#define gx2 301
+#define a2  284
+#define xa2 268
+#define ax2 268
+#define b2  253
+#define c3  239
+#define xc3 225
+#define cx3 225
+#define d3  213
+#define xd3 201
+#define dx3 201
+#define e3  190
+#define f3  179
+#define xf3 169
+#define fx3 169
+#define g3  159
+#define xg3 150
+#define gx3 150
+#define a3  142
+#define xa3 134
+#define ax3 134
+#define b3  127
+#define c4  119
+
+
+
+#define p   1
+
 
 /******************************************************************************
 *
 *   A song is defined by a table of notes. The first byte sets the tempo. A 
 *   high byte will give a low tempo, and opposite. Each tone consists of two 
 *   bytes. The first gives the length of the tone, the other gives the frequency. 
-*   The frequencies for each tone are defined in the "sound.h". Timer0 controls 
+*   The frequencies for each tone are defined above. Timer0 controls 
 *   the tempo and the length of each tone, while Timer1 with PWM gives the 
 *   frequency. The second last byte is a "0" which indicates the end, and the
 *   very last byte makes the song loop if it's "1", and not loop if it's "0".
@@ -177,7 +374,7 @@ const char PLAYING[] PROGMEM   = "PLAYING";
 // mt: int __flash *pSong;     // pointer to the different songs in flash
 const __flash uint16_t *pSong;	// mt - pointer to the different songs in flash
 
-volatile uint8_t gPlaying = FALSE;
+volatile bool gPlaying = false;
 
 static uint8_t Volume   = 80;
 static uint8_t Duration = 0;
@@ -233,11 +430,9 @@ uint8_t SelectSound(uint8_t input)
     static uint8_t song = 0;
     
     
-    if (enter)
-    {
+    if (enter) {
         enter = 0;
         
-        // mt LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[song]), 1);  // mt   // Set up the a song in the LCD
         showSongName(song);
 
         // mt pSong = Songs[song];            // point to this song             
@@ -245,16 +440,14 @@ uint8_t SelectSound(uint8_t input)
 
     }      
         
-    if (input == KEY_PLUS)  // shift to next song
-    {
-        if(!song)       // wrap around the table
-        {
-            for(song=1; pgm_read_word(&TEXT_SONG_TBL[song]); song++){}; // mt
-            
+    if (input == KEY_PLUS) { // shift to next song
+        if(!song) { // wrap around the table
+            for(song=1; pgm_read_word(&TEXT_SONG_TBL[song]); song++){};
             song--;
         }    
-        else
+        else {
             song--;
+        }
 
         // mt LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[song]), 1); // mt
         showSongName(song);
@@ -263,12 +456,12 @@ uint8_t SelectSound(uint8_t input)
         pSong=Songs[song]; 
 
     }    
-    else if (input == KEY_MINUS)    // shift to next song
-    {
+    else if (input == KEY_MINUS) { // shift to next song
         song++;
 
-        if( !(pgm_read_word(&TEXT_SONG_TBL[song])) )       // wrap around the table
+        if( !(pgm_read_word(&TEXT_SONG_TBL[song])) ) { // wrap around the table
             song = 0;
+        }
         
         // mt LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[song]), 1);
         showSongName(song);
@@ -276,13 +469,11 @@ uint8_t SelectSound(uint8_t input)
         // mt pSong = Songs[song];
         pSong=Songs[song];
     }  
-    else if(input == KEY_ENTER)     // start playing
-    {
+    else if(input == KEY_ENTER) { // start playing
         enter = 1;
         return ST_MUSIC_PLAY;
     }
-    else if (input == KEY_PREV)
-    {
+    else if (input == KEY_PREV) {
         enter = 1;
         return ST_MUSIC;
     }    
@@ -305,16 +496,14 @@ uint8_t Sound(uint8_t input)
 {
     static uint8_t enter = 1;
 
-    if (enter)
-    {
+    if (enter) {
         enter = 0;
         Tone = 0;
         Sound_Init();           // start playing
         LCD_puts_f(PLAYING, 1);
-        gPlaying = TRUE;
+        gPlaying = true;
     }        
-    else if (!gPlaying)
-    {
+    else if (!gPlaying) {
         Timer0_RemoveCallbackFunction(Play_Tune);
         TCCR1A = 0;
         TCCR1B = 0;
@@ -322,32 +511,32 @@ uint8_t Sound(uint8_t input)
         return ST_MUSIC_SELECT;
     }
     
-    if (input == KEY_PLUS)          // increase the volum
-    {
-        if(Volume >= 80)
+    if (input == KEY_PLUS) { // increase the volum
+        if(Volume >= 80) {
             Volume = 80;
-        else
+        }
+        else {
             Volume += 5;
+        }
 
         OCR1AH = 0;
         OCR1AL = Volume;
     }
-    else if (input == KEY_MINUS)    // decrease the volum
-    {
-        if(Volume < 11)
+    else if (input == KEY_MINUS) { // decrease the volum
+        if(Volume < 11) {
             Volume = 6;
-        else
+        }
+        else {
             Volume -= 5;   
+        }
         
         OCR1AH = 0;
         OCR1AL = Volume;
     }         
     
-    if (input == KEY_ENTER)         // start/stop playing
-    {   
-        if (gPlaying)
-        {
-            gPlaying = FALSE;
+    if (input == KEY_ENTER) { // start/stop playing   
+        if (gPlaying) {
+            gPlaying = false;
             cbiBF(TCCR1B, 0);                     // stop Playing
             Timer0_RemoveCallbackFunction(Play_Tune);
             TCCR1A = 0;
@@ -356,18 +545,16 @@ uint8_t Sound(uint8_t input)
             enter = 1;
             return ST_MUSIC_SELECT;
         }
-        else
-        {   
+        else {   
             Duration = 0;                       // start Playing
             Tone = 1;
             Sound_Init();
             LCD_puts_f(PLAYING, 1);            
-            gPlaying = TRUE;
+            gPlaying = true;
         }
     }
-    else if (input == KEY_PREV)
-    {
-        gPlaying = FALSE;
+    else if (input == KEY_PREV) {
+        gPlaying = false;
         cbiBF(TCCR1B, 0);                     // stop Playing
         Timer0_RemoveCallbackFunction(Play_Tune);
         TCCR1A = 0;
@@ -398,35 +585,30 @@ void Play_Tune(void)
     
     uint8_t loop;
     
-    if(!Tone)
-    {
+    if(!Tone) {
         Duration = 0;   
         // mt Tempo = *(pSong + 0);
         Tempo = (uint8_t)pSong[0];
         Tone = 1;   //Start the song from the beginning
     }
     
-    if(!Tempo)
-    {
-        if(Duration)        // Check if the lenght of the tone has "expired"
-        {   
+    if(!Tempo) {
+        if(Duration) { // Check if the lenght of the tone has "expired"   
             Duration--;
         }
-        // mt: else if(*(pSong + Tone))    // If not the end of the song
-        else if((uint16_t)pSong[Tone])  // If not the end of the song
-        {
+        else if((uint16_t)pSong[Tone]) { // If not the end of the song
             // mt: Duration = ( DURATION_SEED / *(pSong + Tone) );  // store the duration
             Duration = ( DURATION_SEED / (uint16_t)pSong[Tone] );  // store the duration
         
             Tone++;                     // point to the next tone in the Song-table        
 
             temp_tone=(uint16_t)pSong[Tone]; // mt 200301
-            // mt: if( (*(pSong + Tone) == p) | (*(pSong + Tone) == P) ) // if pause
-            // if( ((uint16_t)pSong[Tone] == p) | ((uint16_t)pSong[Tone] == P) ) // if pause
-            if( (temp_tone == p) || (temp_tone == P) ) // if pause
+            if( (temp_tone == p) || (temp_tone == P) ) { // if pause
                 cbiBF(TCCR1B, CS10);             // stop Timer1, prescaler(1)    
-            else 
+            }
+            else {
                 sbiBF(TCCR1B, CS10);             // start Timer1, prescaler(1)  
+            }
                 
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
@@ -446,21 +628,18 @@ void Play_Tune(void)
             
             Tone++;                     // point to the next tone in the Song-table
         }
-        else    // the end of song
-        {
+        else { // the end of song
             Tone++;         // point to the next tone in the Song-table        
             
             // mt: loop = *(pSong + Tone); // get the byte that tells if the song should loop or not
             loop = (uint8_t)pSong[Tone]; // get the byte that tells if the song should loop or not
             
-            if( loop )  
-            {
+            if( loop ) {
                 Tone = 1;
             }
-            else        // if not looping the song
-            {
+            else { // if not looping the song
                 Tone = 0;
-                gPlaying = FALSE;
+                gPlaying = false;
                 cbiBF(TCCR1B, 0);                     // stop Playing
                 Timer0_RemoveCallbackFunction(Play_Tune);
                 TCCR1A = 0;
@@ -472,8 +651,9 @@ void Play_Tune(void)
         // mt: Tempo = *(pSong + 0);
         Tempo = (uint8_t)pSong[0];
     }
-    else
+    else {
         Tempo--;
+    }
  
 }    
 

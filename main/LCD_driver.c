@@ -6,7 +6,7 @@
 //
 //  Target(s)...: ATmega169
 //
-//  Compiler....: AVR-GCC 4.1.1; avr-libc 1.4.5
+//  Compiler....: avr-gcc 7.3.0; avr-libc 2.0.0
 //
 //  Description.: Functions used to control the AVR Butterfly LCD
 //
@@ -19,6 +19,7 @@
 //  20031009          port to avr-gcc/avr-libc                      - M.Thomas
 //  20070122          "updated 2006-10-10" included (from REV07)    - from Atmel
 //  20070129          SIGNAL->ISR, gLCD_Start_Scroll_Timer volatile - mt
+//  202611xx          see https://github.com/thomas-engineering/bf_gcc
 //
 //*****************************************************************************
 
@@ -28,7 +29,6 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
-// mt - only for AUTO:
 #include "main.h"
 // mt - for gButtonTimeout
 #include "button.h"
@@ -36,11 +36,11 @@
 
 // Variable from "button.c" to prevent button-bouncing
 
-volatile uint8_t gAutoPressJoystick = FALSE;
+volatile JOYSTICK_AUTO_STATE gAutoPressJoystick = JOY_IDLE;
 
 // Used to indicate when the LCD interrupt handler should update the LCD
-// mt jw char gLCD_Update_Required = FALSE;
-volatile uint8_t gLCD_Update_Required = FALSE;
+// mt jw char gLCD_Update_Required = false;
+volatile bool gLCD_Update_Required = false;
 
 // Buffer that contains the text to be displayed as segment-table codes
 // (LCD_CODE_*, filled by LCD_CharToCode). Bit 7 indicates that this character
@@ -61,7 +61,7 @@ volatile uint8_t gLCD_Start_Scroll_Timer = 0;
 volatile uint8_t gFlashTimer = 0;
 
 // Turns on/off the colons on the LCD
-uint8_t gColon = 0;
+bool gColon = false;
 
 
 
@@ -148,7 +148,7 @@ const __flash uint16_t LCD_character_table[] =
 *****************************************************************************/
 void LCD_Init(void)
 {
-    LCD_AllSegments(FALSE);                     // Clear the LCD registers.
+    LCD_AllSegments(false);                     // Clear the LCD registers.
 
     LCD_CONTRAST_LEVEL(LCD_INITIAL_CONTRAST);    //Set the LCD contrast level
 
@@ -169,7 +169,7 @@ void LCD_Init(void)
     //glass provided to the AVR Butterfly production.
     LCDCCR |= (1<<LCDDC2) | (1<<LCDDC1) | (1<<LCDDC0);
 
-    gLCD_Update_Required = FALSE;
+    gLCD_Update_Required = false;
 
 
 }
@@ -196,14 +196,17 @@ uint8_t LCD_CharToCode(char c)
 
     c &= 0x7F;
 
-    if (c == '\0')
+    if (c == '\0') {
         return LCD_CODE_END;
+    }
 
-    if (c >= 'a' && c <= 'z')                   // Convert to upper case
+    if (c >= 'a' && c <= 'z') { // Convert to upper case
         c &= ~0x20;
+    }
 
-    if (c >= '*' && c <= '_')
+    if (c >= '*' && c <= '_') {
         return (uint8_t)(c - '*' + 1) | flash;
+    }
 
     return LCD_CODE_BLANK | flash;
 }
@@ -233,14 +236,17 @@ static inline void LCD_WriteCode(uint8_t code, uint8_t digit)
     uint8_t i;
 
     code &= 0x7F;
-    if (code != LCD_CODE_END && code != LCD_CODE_BLANK)
+    if (code != LCD_CODE_END && code != LCD_CODE_BLANK) {
         seg = LCD_character_table[code - 1];
+    }
 
     // Adjust mask according to LCD segment mapping
-    if (digit & 0x01)
+    if (digit & 0x01) {
         mask = 0x0F;                // Digit 1, 3, 5
-    else
+    }
+    else {
         mask = 0xF0;                // Digit 0, 2, 4
+    }
 
     ptr = pLCDREG + (digit >> 1);   // digit = {0,0,1,1,2,2}
 
@@ -248,8 +254,9 @@ static inline void LCD_WriteCode(uint8_t code, uint8_t digit)
     {
         nibble = seg & 0x000F;
         seg >>= 4;
-        if (digit & 0x01)
+        if (digit & 0x01) {
             nibble <<= 4;
+        }
         *ptr = (*ptr & mask) | nibble;
         ptr += 5;
     }
@@ -263,21 +270,20 @@ static inline void LCD_WriteCode(uint8_t code, uint8_t digit)
 *
 *   Returns :       None
 *
-*   Parameters :    show -  [TRUE;FALSE]
+*   Parameters :    show -  [true;false]
 *
 *   Purpose :       shows or hide all all LCD segments on the LCD
 *
 *****************************************************************************/
-void LCD_AllSegments(uint8_t show)
+void LCD_AllSegments(bool show)
 {
     uint8_t i;
-
-    if (show)
-        show = 0xFF;
+    uint8_t value = show ? 0xFF : 0x00;
 
     // Set/clear all bits in all LCD registers
-    for (i=0; i < LCD_REGISTER_COUNT; i++)
-        *(pLCDREG + i) = show;
+    for (i=0; i < LCD_REGISTER_COUNT; i++) {
+        *(pLCDREG + i) = value;
+    }
 }
 
 
@@ -309,13 +315,11 @@ ISR(LCD_vect)
     c_flash=0; // mt
     
 /**************** Button timeout for the button.c, START ****************/
-    if(!gButtonTimeout)
-    {
+    if(!gButtonTimeout) {
         timeout_count++;
         
-        if(timeout_count > 3)
-        {
-            gButtonTimeout = TRUE;
+        if(timeout_count > 3) {
+            gButtonTimeout = true;
             timeout_count = 0;
         }
     }
@@ -324,100 +328,103 @@ ISR(LCD_vect)
 
 /**************** Auto press joystick for the main.c, START *************/
 
-    if(gAutoPressJoystick == AUTO)
-    {
+    if(gAutoPressJoystick == JOY_AUTO) {
         auto_joystick_count++;
         
-        if(auto_joystick_count > 16)
-        {
-            gAutoPressJoystick = TRUE;
+        if(auto_joystick_count > 16) {
+            gAutoPressJoystick = JOY_PRESSED;
             auto_joystick_count = 15;
         }
     }
-    else
+    else {
         auto_joystick_count = 0;
+    }
 
 
 /**************** Auto press joystick for the main.c, END ***************/    
 
     LCD_timer--;                    // Decreased every LCD frame
 
-    if (gScrollMode)
-    {
+    if (gScrollMode) {
         // If we are in scroll mode, and the timer has expired,
         // we will update the LCD
-        if (LCD_timer == 0)
-        {
-            if (gLCD_Start_Scroll_Timer == 0)
-            {
-                gLCD_Update_Required = TRUE;
+        if (LCD_timer == 0) {
+            if (gLCD_Start_Scroll_Timer == 0) {
+                gLCD_Update_Required = true;
             }
-            else
+            else {
                 gLCD_Start_Scroll_Timer--;
+            }
         }
     }
-    else    
-    {   // if not scrolling,
+    else {   // if not scrolling,
         // disble LCD start of frame interrupt
         // cbi(LCDCRA, LCDIE);   //DEBUG
         gScroll = 0;
     }
 
 
-    EOL = FALSE;
-    if (gLCD_Update_Required == TRUE)
-    {
+    EOL = 0;
+    if (gLCD_Update_Required) {
         // Duty cycle of flashing characters
-        if (gFlashTimer < (LCD_FLASH_SEED >> 1))
+        if (gFlashTimer < (LCD_FLASH_SEED >> 1)) {
             flash = 0;
-        else
+        }
+        else {
             flash = 1;
+        }
 
         // Repeat for the six LCD characters
         for (i = 0; i < 6; i++)
         {
-            if ((gScroll+i) >= 0 && (!EOL))
-            {
+            if ((gScroll+i) >= 0 && (!EOL)) {
                 // We have some visible characters
                 c = gTextBuffer[i + gScroll];
                 c_flash = c & LCD_CODE_FLASH ? 1 : 0;
                 c = c & 0x7F;
 
-                if (c == LCD_CODE_END)
+                if (c == LCD_CODE_END) {
                     EOL = i+1;      // End of character data
+                }
             }
-            else
+            else {
                 c = LCD_CODE_BLANK;
+            }
 
             // Check if this character is flashing
 
-            if (c_flash && flash)
+            if (c_flash && flash) {
                 LCD_WriteCode(LCD_CODE_BLANK, i);
-            else
+            }
+            else {
                 LCD_WriteCode(c, i);
+            }
         }
 
         // Handle colon
-        if (gColon)
+        if (gColon) {
             *(pLCDREG + 8) = 0x01;
-        else
+        }
+        else {
             *(pLCDREG + 8) = 0x00;
+        }
 
         // If the text scrolled off the display,
         // we have to start over again.
-        if (EOL == 1)
+        if (EOL == 1) {
             gScroll = -6;
-        else
+        }
+        else {
             gScroll++;
+        }
 
         // No need to update anymore
-        gLCD_Update_Required = FALSE;
+        gLCD_Update_Required = false;
     }
 
 
     // LCD_timer is used when scrolling text
-    if (LCD_timer == 0)
-    {
+    if (LCD_timer == 0) {
 /*        if ((gScroll <= 0) || EOL)
             LCD_timer = LCD_TIMER_SEED/2;
         else*/
@@ -425,9 +432,11 @@ ISR(LCD_vect)
     }
 
     // gFlashTimer is used when flashing characters
-    if (gFlashTimer == LCD_FLASH_SEED)
+    if (gFlashTimer == LCD_FLASH_SEED) {
         gFlashTimer= 0;
-    else
+    }
+    else {
         gFlashTimer++;
+    }
 
 }

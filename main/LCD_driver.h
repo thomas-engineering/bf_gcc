@@ -1,4 +1,8 @@
+#ifndef LCD_DRIVER_H_
+#define LCD_DRIVER_H_
+
 #include <stdint.h>
+#include <stdbool.h>
 //*****************************************************************************
 //
 //  File........: LCD_Driver.h
@@ -54,15 +58,24 @@
 // Global variables
 /************************************************************************/
 // mt: volatiles added (based on jw patch)
-extern volatile uint8_t gLCD_Update_Required;
+extern volatile bool gLCD_Update_Required;
 // Text as segment-table codes (see LCD_CharToCode), not as ASCII. Bit 7 marks a
 // flashing character. +1: room for the terminator of a full-length text.
 extern volatile uint8_t gTextBuffer[TEXTBUFFER_SIZE + 1];
 extern volatile uint8_t gScrollMode;
 extern volatile uint8_t gFlashTimer;
-extern uint8_t gColon;
+extern bool gColon;
 extern volatile int8_t gScroll;
-extern volatile uint8_t gAutoPressJoystick;
+// State of the joystick auto-repeat. Packed to one byte so that the access
+// from the LCD interrupt and from the main loop stays atomic on the AVR.
+typedef enum __attribute__((packed))
+{
+    JOY_IDLE,       // button state changed, nothing pending
+    JOY_PRESSED,    // button held, auto press armed
+    JOY_AUTO        // auto press active (repeat counter running)
+} JOYSTICK_AUTO_STATE;
+
+extern volatile JOYSTICK_AUTO_STATE gAutoPressJoystick;
 extern volatile uint8_t gLCD_Start_Scroll_Timer;
 
 /************************************************************************/
@@ -70,4 +83,6 @@ extern volatile uint8_t gLCD_Start_Scroll_Timer;
 /************************************************************************/
 void LCD_Init (void);
 uint8_t LCD_CharToCode(char c);
-void LCD_AllSegments(uint8_t show);
+void LCD_AllSegments(bool show);
+
+#endif /* LCD_DRIVER_H_ */

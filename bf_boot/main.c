@@ -146,27 +146,24 @@ int main(void)
 
 	for(;OK;)
 	{
-		if(!(PINB & (1<<PINB6)) && APPLICATION_PRESENT())	// joystick up and an application is programmed
-        {   // joystick "up" detected
+		if(!(PINB & (1<<PINB6)) && APPLICATION_PRESENT()) {	// joystick up and an application is programmed
+            // joystick "up" detected
             MCUCR = (1<<IVCE); 
             MCUCR = (0<<IVSEL);             //move interruptvectors to the Application sector
             funcptr();      // Jump to application sector   
         }
         //else if(PINB & (1<<PORTB4))                     // If joystick not in the ENTER-position
-		else if(PINB & (1<<PINB4))                     // If joystick not in the ENTER-position
-        {
+		else if(PINB & (1<<PINB4)) { // If joystick not in the ENTER-position
             UCSRA = 0x02;
             SMCR = (3<<SM0) | (1<<SE);      // Enable Power-save mode
             asm volatile ("sleep"::);		 // Go to sleep
 			
             SMCR = 0;                       // Just woke, disable sleep
         }
-        else
-        {	
+        else {	
             val = recchar();
    
-            if( val == 0x1B)
-         	{							// AVRPROG connection
+            if( val == 0x1B) {							// AVRPROG connection
           		while (val != 'S')				// Wait for signon 
           		{
           		  val = recchar();
@@ -184,8 +181,9 @@ int main(void)
                 
                 OK = 0;
             }
-    		else
+    		else {
 	    		sendchar('?');
+    		}
         }
 	}			
 
@@ -194,13 +192,11 @@ int main(void)
         wdt_reset();                        // programmer is still talking to us
         val=recchar();
          
-        if(val=='a')                        //Autoincrement?
-        {
+        if(val=='a') { //Autoincrement?
           sendchar('Y');		    		//Autoincrement is quicker
         }
  
-        else if(val=='A')                   //write address 
-        {
+        else if(val=='A') { //write address
           address=recchar();                //read address 8 MSB
           address=(address<<8)|recchar();
         
@@ -208,16 +204,14 @@ int main(void)
           sendchar('\r');
         }
         
-        else if(val=='b')
-		{									// Buffer load support
+        else if(val=='b') {									// Buffer load support
 			sendchar('Y');					// Report buffer load supported
 			sendchar((UART_RX_BUFFER_SIZE >> 8) & 0xFF);
 											// Report buffer size in bytes
 			sendchar(UART_RX_BUFFER_SIZE & 0xFF);
 		}
 
-		else if(val=='B')					// Start buffer load
-		{
+		else if(val=='B') { // Start buffer load
 			tempi = recchar() << 8;			// Load high byte of buffersize
 			tempi |= recchar();				// Load low byte of buffersize
 			val = recchar();				// Load memory type ('E' or 'F')
@@ -225,8 +219,7 @@ int main(void)
 											// Start downloading of buffer
 		}
 		
-		else if(val == 'g')					// Block read
-		{
+		else if(val == 'g') { // Block read
 			tempi = (recchar() << 8) | recchar();
 
 			val = recchar();				// Get memtype
@@ -250,10 +243,8 @@ int main(void)
           sendchar('\r');
         }
 */        
-        else if(val=='e')                   //Chip erase 
-        {
-		  if (device == devtype)
-          {
+        else if(val=='e') { //Chip erase
+		  if (device == devtype) {
             for(address=0;address < APP_END;address += PAGESIZE)    //Application section = 60 pages
             {
                 wdt_reset();
@@ -265,8 +256,7 @@ int main(void)
           sendchar('\r');        
         }
 
-        else if(val=='E')                   //Exit upgrade
-        {
+        else if(val=='E') { //Exit upgrade
 		  sendchar('\r');
 		  wdt_enable(WDTO_15MS);            // let the watchdog reset the board
 		  for (;;)
@@ -294,18 +284,15 @@ int main(void)
         }
 */        
         
-        else if(val=='P')     // Enter programming mode 
-        {
+        else if(val=='P') { // Enter programming mode
           sendchar('\r');
         }
         
-        else if(val=='L')   // Leave programming mode
-        { 
+        else if(val=='L') { // Leave programming mode 
           sendchar('\r');
         }
         
-        else if (val=='p')		// mt: return programmer type
-        {
+        else if (val=='p') { // mt: return programmer type
           sendchar('S');		// serial programmer
         }        
 /*        
@@ -353,49 +340,41 @@ int main(void)
 // interpreted correctly. Locks and high fuse do not work at all (in AVRPROG 1.37)
 // Reason for this should be the difference between ATmega16 and ATmega169.
 // AVRPROG interprets the results as from an ATmega16 while they are from an ATmega169
-        else if(val=='F')                   // read fuse bits
-        {
+        else if(val=='F') { // read fuse bits
           sendchar(read_program_memory(0x0000,0x09)); // 0x09 for (1<<BLBSET)|(1<<SPMEN)
         }
 
-        else if(val=='r')                   // read lock bits
-        { 
+        else if(val=='r') { // read lock bits 
           sendchar(read_program_memory(0x0001,0x09));
         }        
 
-        else if(val=='N')                   // read high fuse bits
-        {
+        else if(val=='N') { // read high fuse bits
           // mt sendchar(read_program_memory(0x0003));
 		  sendchar(read_program_memory(0x0003,0x09));
         }        
 
-        else if(val=='Q')                   // read extended fuse bits
-        {
+        else if(val=='Q') { // read extended fuse bits
           sendchar(read_program_memory(0x0002,0x09));
         }
 #endif	
 // end of ENABLEREADFUSELOCK section
 
-        else if(val=='t')                   // Return programmer type 
-        {
+        else if(val=='t') { // Return programmer type
           sendchar(devtype);
           sendchar(0);
         }
 
-        else if ((val=='x')||(val=='y'))	// mt: clear and set LED ignored
-        {
+        else if ((val=='x')||(val=='y')) { // mt: clear and set LED ignored
           recchar();
           sendchar('\r');
         }
        
-       else if (val=='T')	// mt:  set device/programmer type in bootloader (?)
-       {
+       else if (val=='T') { // mt:  set device/programmer type in bootloader (?)
          device = recchar();
           sendchar('\r');
        }
         
-        else if (val=='S')                  // Return software identifier 
-        {
+        else if (val=='S') { // Return software identifier
           sendchar('A');
           sendchar('V');
           sendchar('R');
@@ -405,21 +384,18 @@ int main(void)
           sendchar('T');
         }                
         
-        else if (val=='V')                  // Return Software Version
-        {
+        else if (val=='V') { // Return Software Version
           sendchar('0');	// mt: changed from 2;0 to 0;1 
           sendchar('3');
         }        
 
-        else if (val=='s')                  // Return Signature Byte
-        {
+        else if (val=='s') { // Return Signature Byte
           sendchar(sig_byte1);
           sendchar(sig_byte2);
           sendchar(sig_byte3);
         }       
 
-        else if(val!=0x1b)                  // if not esc
-        {
+        else if(val!=0x1b) { // if not esc
           sendchar('?');
         }
       }
@@ -451,15 +427,15 @@ void sendchar(char data)
     
     UDR = data;
     
-    if(SREG & 0x80)
-    {
+    if(SREG & 0x80) {
 		while ( !(UCSRA&0x40) && (i<10000) )
 		{
 			i++;
 		}
     }
-    else 
+    else {
         while( !(UCSRA&0x40) );
+    }
         
     UCSRA=UCSRA|0x40;                             //delete TXCflag
 }
@@ -469,15 +445,15 @@ char recchar(void)
 {
     int i = 0;
     
-    if(SREG & 0x80)
-    {
+    if(SREG & 0x80) {
 		while (!(UCSRA & (1<<RXC)) && (i<10000))
 		{
 			i++;
 		}
     }
-    else
+    else {
         while(!(UCSRA & (1<<RXC)));
+    }
         
     return UDR;
 }
@@ -498,17 +474,19 @@ unsigned char BufferLoad(unsigned int size, unsigned char mem)
 	
 	// store values to be programmed in temporary buffer
 	for (cnt=0; cnt<UART_RX_BUFFER_SIZE; cnt++) {
-		if ((unsigned int)cnt<size) gBuffer[cnt]=recchar();
-		else gBuffer[cnt]=0xFF;
+		if ((unsigned int)cnt<size) {
+			gBuffer[cnt]=recchar();
+		}
+		else {
+			gBuffer[cnt]=0xFF;
+		}
 	}
 	cnt=0;
 	
 	tempaddress = address;					// Store address in page
 	
-	if (device == devtype)
-	{
-		if (mem == 'F' && (unsigned int)tempaddress < APP_END)	// never touch the bootloader section
-		{
+	if (device == devtype) {
+		if (mem == 'F' && (unsigned int)tempaddress < APP_END) { // never touch the bootloader section
 			// erase the page here, so the upload also works when the
 			// programmer does not send a chip erase (e.g. avrdude -D)
 			write_page(tempaddress & 0xFF80, (1<<PGERS) + (1<<SPMEN));
@@ -528,15 +506,13 @@ unsigned char BufferLoad(unsigned int size, unsigned char mem)
 
 			write_page(tempaddress,(1<<RWWSRE) + (1<<SPMEN));
 											//Re-enable the RWW section
-			if (address != (address & 0xFF80))
-			{								// Ensure that the address points to the beginning of the next page
+			if (address != (address & 0xFF80)) {								// Ensure that the address points to the beginning of the next page
 				address &= 0xFF80;
 				address += PAGESIZE;
 			}
 		}									// End FLASH
 		
-		if (mem == 'E')						// Start EEPROM
-        {
+		if (mem == 'E') { // Start EEPROM
 			address>>=1;
 			do {
 	 	        EEARL = address;			// Setup EEPROM address
@@ -559,8 +535,7 @@ void BlockRead(unsigned int size, unsigned char mem)
 {
 	unsigned int data;
 	
-	if (mem == 'E')							// Read EEPROM
-	{
+	if (mem == 'E') { // Read EEPROM
 		do {
 			EEARL = address;				// Setup EEPROM address
 			EEARH = (address >> 8);
@@ -570,8 +545,7 @@ void BlockRead(unsigned int size, unsigned char mem)
 			size--;							// Decrease number of bytes to read
 		} while (size);					// Repeat until all block has been read
 	}
-	else									// Read Flash
-	{
+	else { // Read Flash
 		do {
 			data = read_program_memory(address,0x00);
 			sendchar((char)data);			//send LSB
@@ -640,28 +614,25 @@ void OSCCAL_calibration(void)
 
         sei(); // __enable_interrupt();  // enable global interrupt
     
-        if ( (TIFR1 & (1<<TOV1)) ) // if ( (TIFR1 && (1<<TOV1)) )
-        {
+        if ( (TIFR1 & (1<<TOV1)) ) { // if ( (TIFR1 && (1<<TOV1)) )
             temp = 0xFFFF;      // if timer1 overflows, set the temp to 0xFFFF
         }
-        else
-        {   // read out the timer1 counter value
+        else {   // read out the timer1 counter value
             tempL = TCNT1L;
             temp = TCNT1H;
             temp = (temp << 8);
             temp += tempL;
         }
     
-        if (temp > 6250)
-        {
+        if (temp > 6250) {
             OSCCAL--;   // the internRC oscillator runs to fast, decrease the OSCCAL
         }
-        else if (temp < 6120)
-        {
+        else if (temp < 6120) {
             OSCCAL++;   // the internRC oscillator runs to slow, increase the OSCCAL
         }
-        else
+        else {
             calibrate = TRUE;   // the interRC is correct
+        }
     
         TCCR1B = (1<<CS10); // start timer1
     }

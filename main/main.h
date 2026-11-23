@@ -1,3 +1,6 @@
+#ifndef MAIN_H_
+#define MAIN_H_
+
 //Revisions number
 #define SWHIGH  0
 #define SWLOW   7
@@ -35,14 +38,9 @@ static inline void SetClockPrescaler(uint8_t clkps)
 #include <stdbool.h>
 #include <stddef.h>      // NULL
 
-#define BOOL    bool
 
-extern volatile BOOL gKeyClickStatus;   // keyclick on/off, defined in main.c
+extern volatile bool gKeyClickStatus;   // keyclick on/off, defined in main.c
 
-#define FALSE   false
-#define TRUE    true
-
-#define AUTO    3
 
 // Macro definitions
 // sbi and cbi are not longer supported by the avr-libc
@@ -98,3 +96,5 @@ extern volatile BOOL gKeyClickStatus;   // keyclick on/off, defined in main.c
 #define ST_OPTIONS_KEYCLICK_FUNC        101
 
 
+
+#endif /* MAIN_H_ */

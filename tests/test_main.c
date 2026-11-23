@@ -20,29 +20,36 @@ static int checks, failures;
 
 static void test_bcd(void)
 {
-    for (int v = 0; v <= 99; v++)
+    for (int v = 0; v <= 99; v++) {
         CHECK((uint8_t)CHAR2BCD2((char)v) == (uint8_t)(((v / 10) << 4) | (v % 10)));
+    }
 
-    for (int v = 0; v <= 255; v++)
+    for (int v = 0; v <= 255; v++) {
         CHECK(CHAR2BCD3((char)v) == (uint16_t)(((v / 100) << 8) | (((v / 10) % 10) << 4) | (v % 10)));
+    }
 }
 
 /* the nested if/else chain that used to be copied into RTC.c */
 static bool leap_reference(uint16_t y)
 {
-    if (!(y & 0x0003))
-        if (y % 100 == 0)
+    if (!(y & 0x0003)) {
+        if (y % 100 == 0) {
             return y % 400 == 0;
-        else
+        }
+        else {
             return true;
-    else
+        }
+    }
+    else {
         return false;
+    }
 }
 
 static void test_calendar(void)
 {
-    for (uint16_t y = 0; y < 10000; y++)
+    for (uint16_t y = 0; y < 10000; y++) {
         CHECK(is_leap_year(y) == leap_reference(y));
+    }
 
     CHECK(is_leap_year(0));      /* 2000 */
     CHECK(is_leap_year(4));
