@@ -75,7 +75,7 @@ bool gColon = false;
 
 // Look-up table used when converting ASCII to
 // LCD display data (segment control)
-const __flash uint16_t LCD_character_table[] =
+const uint16_t LCD_character_table[] PROGMEM =
 {
     0x0A51,     // '*' (?)
     0x2A80,     // '+'
@@ -237,7 +237,7 @@ static inline void LCD_WriteCode(uint8_t code, uint8_t digit)
 
     code &= 0x7F;
     if (code != LCD_CODE_END && code != LCD_CODE_BLANK) {
-        seg = LCD_character_table[code - 1];
+        seg = pgm_read_word(&LCD_character_table[code - 1]);
     }
 
     // Adjust mask according to LCD segment mapping

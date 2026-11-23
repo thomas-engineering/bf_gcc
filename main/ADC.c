@@ -33,7 +33,7 @@
 #include "LCD_functions.h"
 #include "timer0.h"
 
-const __flash uint16_t TEMP_Celsius_pos[] =    // Positive Celsius temperatures (ADC-value)
+const uint16_t TEMP_Celsius_pos[] PROGMEM =    // Positive Celsius temperatures (ADC-value)
         {                           // from 0 to 60 degrees
             806,796,786,775,765,754,743,732,720,709,697,685,673,661,649,
             636,624,611,599,586,574,562,549,537,524,512,500,488,476,464,
@@ -42,12 +42,12 @@ const __flash uint16_t TEMP_Celsius_pos[] =    // Positive Celsius temperatures 
             187,
         };
 
-const __flash uint16_t TEMP_Celsius_neg[] =    // Negative Celsius temperatures (ADC-value)
+const uint16_t TEMP_Celsius_neg[] PROGMEM =    // Negative Celsius temperatures (ADC-value)
         {                           // from -1 to -15 degrees
             815,825,834,843,851,860,868,876,883,891,898,904,911,917,923,
         };
 
-const __flash uint16_t TEMP_Fahrenheit_pos[] =  // Positive Fahrenheit temperatures (ADC-value)
+const uint16_t TEMP_Fahrenheit_pos[] PROGMEM =  // Positive Fahrenheit temperatures (ADC-value)
 		{                           // from 0 to 140 degrees
 			938, 935, 932, 929, 926, 923, 920, 916, 913, 909, 906, 902, 898, 
 			894, 891, 887, 882, 878, 874, 870, 865, 861, 856, 851, 847, 842, 
@@ -63,13 +63,13 @@ const __flash uint16_t TEMP_Fahrenheit_pos[] =  // Positive Fahrenheit temperatu
 		};
 
         
-const __flash uint16_t LIGHT_ADC[] = // Table used to find the Vref, when using the voltage-reading function 
+const uint16_t LIGHT_ADC[] PROGMEM = // Table used to find the Vref, when using the voltage-reading function 
         { 
             0x35,0x60,0x80,0x0B0,0x11D,0x13D,0x15A,0x17A,0x197,0x1B9,0x1DA,
             0x1F9,0x216,0x240,0x26D,0x282,0x2A2,0x2EF,0x332,0x3B0,0x3F2
         };
         
-const __flash float LIGHT_VOLTAGE[] = // Vref table correspondent to the LIGHT_ADC[] table
+const float LIGHT_VOLTAGE[] PROGMEM = // Vref table correspondent to the LIGHT_ADC[] table
         {
             2.818,2.820,2.824,2.827,2.832,2.835,2.839,2.841,2.843,2.847,2.850,
             2.853,2.857,2.863,2.867,2.870,2.874,2.882,2.893,2.917,2.939
@@ -232,7 +232,7 @@ void ADC_periphery(void)
             if(ADCresult > 810) { // If it's a negtive temperature    
                 for (i=0; i<=25; i++)   // Find the temperature
                 {
-                    if (ADCresult <= TEMP_Celsius_neg[i]) {
+                    if (ADCresult <= pgm_read_word(&TEMP_Celsius_neg[i])) {
                         break;
                     }
                 }
@@ -242,7 +242,7 @@ void ADC_periphery(void)
             else if (ADCresult < 800) { // If it's a positive temperature
                 for (i=0; i<100; i++)  
                 {
-                    if (ADCresult >= TEMP_Celsius_pos[i]) {
+                    if (ADCresult >= pgm_read_word(&TEMP_Celsius_pos[i])) {
                         break;
                     }
                 }        
@@ -270,7 +270,7 @@ void ADC_periphery(void)
         else if (degree == FAHRENHEIT) {
             for (i=0; i<=141; i++)   // Find the temperature
             {
-                if (ADCresult > TEMP_Fahrenheit_pos[i]) {
+                if (ADCresult > pgm_read_word(&TEMP_Fahrenheit_pos[i])) {
                     break;
                 }
             }        
@@ -312,7 +312,7 @@ void ADC_periphery(void)
         // Find Vref
         for (i=0; i<=22; i++)
         {
-            if (ADCresult <= LIGHT_ADC[i]) {
+            if (ADCresult <= pgm_read_word(&LIGHT_ADC[i])) {
                 break;
             }
         }
@@ -323,7 +323,7 @@ void ADC_periphery(void)
             Vref = 2.942;   // if it's totally dark
         }
         else {
-            Vref = LIGHT_VOLTAGE[i];
+            memcpy_P(&Vref, &LIGHT_VOLTAGE[i], sizeof(Vref));   // float from flash
         }
           
         ADMUX = VOLTAGE_SENSOR;     

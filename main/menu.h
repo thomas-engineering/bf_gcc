@@ -51,7 +51,7 @@ const char MT_OPTIONS_AUTO_POWER_SAVE[] PROGMEM   = "Auto Power Save";
 const char MT_OPTIONS_KEYCLICK[] PROGMEM          = "Key Click";
 
 // mt MENU_NEXTSTATE menu_nextstate[] = { 
-const __flash MENU_NEXTSTATE menu_nextstate[] = {
+const MENU_NEXTSTATE menu_nextstate[] PROGMEM = {
 //  STATE                       INPUT       NEXT STATE
     {ST_AVRBF,                  KEY_PLUS,   ST_OPTIONS},
     {ST_AVRBF,                  KEY_NEXT,   ST_AVRBF_REV},
@@ -170,7 +170,7 @@ const __flash MENU_NEXTSTATE menu_nextstate[] = {
 
 
 // mt MENU_STATE menu_state[] = {
-const __flash MENU_STATE menu_state[] = {
+const MENU_STATE menu_state[] PROGMEM = {
 //  STATE                               STATE TEXT                  STATE_FUNC
     {ST_AVRBF,                          MT_AVRBF,                   NULL},
     {ST_AVRBF_REV,                      NULL,                       Revision},

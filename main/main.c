@@ -144,7 +144,7 @@ int main(void)
             if (nextstate != state) {
                 state = nextstate;
                 // mt: for (i=0; menu_state[i].state; i++)
-                for (i=0; (j=menu_state[i].state); i++)
+                for (i=0; (j=pgm_read_byte(&menu_state[i].state)); i++)
                 {
                     //mt: if (menu_state[i].state == state)
                     //mt 1/06 if (menu_state[i].state == state)
@@ -152,10 +152,10 @@ int main(void)
                         // mt - original: statetext =  menu_state[i].pText;
                         // mt - original: pStateFunc = menu_state[i].pFunc;
                         /// mt this is like the example from an avr-gcc guru (mailing-list):
-                        statetext =  menu_state[i].pText;
+                        statetext = (PGM_P)pgm_read_word(&menu_state[i].pText);
                         // mt - store pointer to function from menu_state[i].pFunc in pStateFunc
                         //// pStateFunc = pmttemp;	// oh je - wie soll ich das jemals debuggen - ?
-                        pStateFunc = menu_state[i].pFunc;
+                        pStateFunc = (uint8_t (*)(uint8_t))pgm_read_word(&menu_state[i].pFunc);
                         break;
                     }
                 }
@@ -268,15 +268,15 @@ uint8_t StateMachine(uint8_t cur_state, uint8_t stimuli)
     uint8_t i, j;
 
     // mt: for (i=0; menu_nextstate[i].state; i++)
-    for (i=0; ( j=menu_nextstate[i].state ); i++ )
+    for (i=0; ( j=pgm_read_byte(&menu_nextstate[i].state) ); i++ )
     {
         // mt: if (menu_nextstate[i].state == state && menu_nextstate[i].input == stimuli)
         // mt 1/06 : if (menu_nextstate[i].state == state && 
         if ( j == cur_state && 
-             menu_nextstate[i].input == stimuli) {
+             pgm_read_byte(&menu_nextstate[i].input) == stimuli) {
             // This is the one!
             // mt: nextstate = menu_nextstate[i].nextstate;
-            nextstate = menu_nextstate[i].nextstate;
+            nextstate = pgm_read_byte(&menu_nextstate[i].nextstate);
             break;
         }
     }

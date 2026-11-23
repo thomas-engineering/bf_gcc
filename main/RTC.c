@@ -67,14 +67,14 @@ const char CANADIAN_DATE_TEXT[] PROGMEM =   "YYMMDD";
 //__flash char EUROPEAN_DATE_NR[] =   { 4, 5, 2, 3, 0, 1 };
 //__flash char AMERICAN_DATE_NR[] =   { 4, 5, 0, 1, 2, 3 };
 //__flash char CANADIAN_DATE_NR[] =   { 0, 1, 2, 3, 4, 5 }; 
-const __flash uint8_t EUROPEAN_DATE_NR[] =   { 4, 5, 2, 3, 0, 1 };
-const __flash uint8_t AMERICAN_DATE_NR[] =   { 4, 5, 0, 1, 2, 3 };
-const __flash uint8_t CANADIAN_DATE_NR[] =   { 0, 1, 2, 3, 4, 5 }; 
+const uint8_t EUROPEAN_DATE_NR[] PROGMEM =   { 4, 5, 2, 3, 0, 1 };
+const uint8_t AMERICAN_DATE_NR[] PROGMEM =   { 4, 5, 0, 1, 2, 3 };
+const uint8_t CANADIAN_DATE_NR[] PROGMEM =   { 0, 1, 2, 3, 4, 5 }; 
 
 //__flash char __flash *DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
 //__flash char __flash *DATE_FORMAT_NR[] = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
 PGM_P DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
-const __flash uint8_t * const __flash DATE_FORMAT_NR[] = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
+const uint8_t * const DATE_FORMAT_NR[] PROGMEM = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
 
 
 
@@ -417,21 +417,13 @@ uint8_t ShowDate(uint8_t input)
     DL = (DH & 0x0F) + '0';
     DH = (DH >> 4) + '0';
 
-	/*
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 0), YH);
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 1), YL);
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 2), MH);
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 3), ML);
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 4), DH);
-    LCD_putc( *(DATE_FORMAT_NR[dateformat] + 5), DL);
-	*/
-   	const __flash uint8_t *pDateFormatNr = DATE_FORMAT_NR[dateformat];
-    LCD_putc( *pDateFormatNr++, YH);
-    LCD_putc( *pDateFormatNr++, YL);
-    LCD_putc( *pDateFormatNr++, MH);
-    LCD_putc( *pDateFormatNr++, ML);
-	LCD_putc( *pDateFormatNr++, DH);
-    LCD_putc( *pDateFormatNr, DL);
+   	const uint8_t *pDateFormatNr = (const uint8_t *)pgm_read_word(&DATE_FORMAT_NR[dateformat]);
+    LCD_putc( pgm_read_byte(pDateFormatNr++), YH);
+    LCD_putc( pgm_read_byte(pDateFormatNr++), YL);
+    LCD_putc( pgm_read_byte(pDateFormatNr++), MH);
+    LCD_putc( pgm_read_byte(pDateFormatNr++), ML);
+	LCD_putc( pgm_read_byte(pDateFormatNr++), DH);
+    LCD_putc( pgm_read_byte(pDateFormatNr), DL);
 
     LCD_putc(6, '\0');
 

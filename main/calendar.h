@@ -10,9 +10,11 @@
 #include <stdbool.h>
 
 #ifdef __AVR__
-#define CALENDAR_FLASH  __flash     // keep the table out of RAM
+#include <avr/pgmspace.h>
 #else
-#define CALENDAR_FLASH              // host build (unit tests)
+// host build (unit tests): no separate flash address space
+#define PROGMEM
+#define pgm_read_byte(addr)  (*(const uint8_t *)(addr))
 #endif
 
 static inline bool is_leap_year(uint16_t year)
@@ -29,7 +31,7 @@ static inline bool is_leap_year(uint16_t year)
 // Number of days of month 1..12 (0 for an invalid month).
 static inline uint8_t days_in_month(uint16_t year, uint8_t month)
 {
-    static const CALENDAR_FLASH uint8_t length[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    static const uint8_t length[13] PROGMEM = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     if (month < 1 || month > 12) {
         return 0;
@@ -37,7 +39,7 @@ static inline uint8_t days_in_month(uint16_t year, uint8_t month)
     if (month == 2 && is_leap_year(year)) {
         return 29;
     }
-    return length[month];
+    return pgm_read_byte(&length[month]);
 }
 
 #endif /* CALENDAR_H_ */
