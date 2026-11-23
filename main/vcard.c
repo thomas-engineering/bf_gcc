@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include "bfeeprom.h"
 #include "main.h"
@@ -35,6 +34,9 @@
 #include "LCD_functions.h"
 #include "usart.h"
 #include "vcard.h"
+
+// texts for LCD_puts_f(), stored in flash
+static const __flash char TXT_WAITING_FOR_INPUT_ON_RS232[] = "waiting for input on RS232";
 
 
 bool gUART = false;
@@ -238,7 +240,7 @@ uint8_t RS232(uint8_t input)
         SetClockPrescaler(CLOCK_2MHZ);
         
         // mt jw-meth: LCD_puts_f(TEXT_WAIT, 0);
-        LCD_puts_f(PSTR("waiting for input on RS232"), 0);
+        LCD_puts_f(TXT_WAITING_FOR_INPUT_ON_RS232, 0);
         enter = 0;
         temp_index = 0;
         c = UDR;                       // Dummy read to clear receive buffer

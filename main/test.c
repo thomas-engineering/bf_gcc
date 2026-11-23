@@ -31,7 +31,20 @@
 #include "sound.h"
 #include "ADC.h"
 #include "RTC.h"
-#include "dataflash.h"
+#include "dataflash.h"
+
+// texts for LCD_puts_f(), stored in flash
+static const __flash char TXT_TEST[] = "Test";
+static const __flash char TXT_LEFT[] = "Left";
+static const __flash char TXT_UP[] = "Up";
+static const __flash char TXT_RIGHT[] = "Right";
+static const __flash char TXT_DOWN[] = "Down";
+static const __flash char TXT_SOUND[] = "Sound";
+static const __flash char TXT_LCD_TEST[] = "LCD test";
+static const __flash char TXT_ERROR_TEMPERATURE[] = "Error Temperature";
+static const __flash char TXT_ERROR_VOLTAGE[] = "Error Voltage";
+static const __flash char TXT_LIGHT[] = "Light";
+static const __flash char TXT_ERROR_DATAFLASH[] = "Error DataFlash";
 
 #define pLCDREG_test (*(uint8_t *)(0xEC))
 
@@ -56,34 +69,34 @@ void Test(void)
     TIMSK2 = 0; // Stop clock, the interrupt will disturb the sound-test cause
                 // the play-routine doesn't use interrupt...
 
-    LCD_puts_f(PSTR("Test"),0); // mt LCD_puts("Test",0);
+    LCD_puts_f(TXT_TEST,0); // mt LCD_puts("Test",0);
     TestWaitEnter();
 
 
 //// //// //// //// JOYSTICK TEST //// //// //// ////
 
-    LCD_puts_f(PSTR("Left"),0);// mt LCD_puts("Left",0);
+    LCD_puts_f(TXT_LEFT,0);// mt LCD_puts("Left",0);
     
     while(input != KEY_PREV)
     {
         input = getkey();           // Read buttons
     }
     
-    LCD_puts_f(PSTR("Up"),0);// mt LCD_puts("Up",0);
+    LCD_puts_f(TXT_UP,0);// mt LCD_puts("Up",0);
     
     while(input != KEY_PLUS)
     {
         input = getkey();           // Read buttons
     }
     
-    LCD_puts_f(PSTR("Right"),0);// mt LCD_puts("Right",0);
+    LCD_puts_f(TXT_RIGHT,0);// mt LCD_puts("Right",0);
     
     while(input != KEY_NEXT)
     {
         input = getkey();           // Read buttons
     }
     
-    LCD_puts_f(PSTR("Down"),0);// mt LCD_puts("Down",0);
+    LCD_puts_f(TXT_DOWN,0);// mt LCD_puts("Down",0);
     
     while(input != KEY_MINUS)
     {
@@ -94,7 +107,7 @@ void Test(void)
 
 //// //// //// //// SOUND TEST //// //// //// ////
     
-    LCD_puts_f(PSTR("Sound"),0);// mt LCD_puts("Sound",0);
+    LCD_puts_f(TXT_SOUND,0);// mt LCD_puts("Sound",0);
     TestWaitEnter();
     
     TCCR1A = (1<<COM1A1);// | (1<<COM1A0); // Set OC1A when upcounting, clear when downcounting
@@ -122,7 +135,7 @@ void Test(void)
 
 //// //// //// //// LCD TEST //// //// //// ////    
     
-    LCD_puts_f(PSTR("LCD test"),0);// mt LCD_puts("LCD test",0);
+    LCD_puts_f(TXT_LCD_TEST,0);// mt LCD_puts("LCD test",0);
 
     // mt while(!(PINB & (1<<PORTB4)));
     while(!(PINB & (1<<PINB4)));
@@ -159,7 +172,7 @@ void Test(void)
     
     //check if temperature is between 21 and 30 degree Celcius
     if( (integer < 452) || (integer > 586) ) {
-        LCD_puts_f(PSTR("Error Temperature"),0);// mt LCD_puts("Error Temperature",0);
+        LCD_puts_f(TXT_ERROR_TEMPERATURE,0);// mt LCD_puts("Error Temperature",0);
         ErrorBeep();
         TestWaitEnter();
         ADC_periphery();
@@ -175,7 +188,7 @@ void Test(void)
 
     //if measuring outside 4,8 to 5,2 V
     if( (integer < 298) || (integer > 320) ) {
-        LCD_puts_f(PSTR("Error Voltage"),0);// mt LCD_puts("Error Voltage",0);
+        LCD_puts_f(TXT_ERROR_VOLTAGE,0);// mt LCD_puts("Error Voltage",0);
         ErrorBeep();
         TestWaitEnter();
         ADC_periphery();
@@ -186,7 +199,7 @@ void Test(void)
 
 //// //// //// //// LIGHT TEST //// //// //// ////    
 
-    LCD_puts_f(PSTR("Light"),0);// mt LCD_puts("Light",0);
+    LCD_puts_f(TXT_LIGHT,0);// mt LCD_puts("Light",0);
     TestWaitEnter();
 
     ADC_init(2);
@@ -220,7 +233,7 @@ void Test(void)
     {
         
         if(j != DF_SPI_RW(0x00) ) {
-            LCD_puts_f(PSTR("Error DataFlash"),0);// mt LCD_puts("Error Dataflash",0);
+            LCD_puts_f(TXT_ERROR_DATAFLASH,0);// mt LCD_puts("Error Dataflash",0);
             ErrorBeep();
             TestWaitEnter();
             break;

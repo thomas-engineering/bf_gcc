@@ -23,10 +23,8 @@
 //
 //*****************************************************************************
 
-#include <avr/pgmspace.h>
-
 //Functions
-void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode);
+void LCD_puts_f(const __flash char *pFlashStr, uint8_t scrollmode);
 void LCD_puts(char *pStr, uint8_t scrollmode);
 void LCD_UpdateRequired(bool update, uint8_t scrollmode);
 //mt void LCD_putc(char digit, char character);

@@ -46,7 +46,6 @@
 // #include "assembly.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <lowlevel.h>
 
@@ -87,7 +86,7 @@ void wdt_off_at_startup(void)
 }
 
 // A flash that is still erased (reset vector 0xFFFF) holds no application.
-#define APPLICATION_PRESENT()   (pgm_read_word(0x0000) != 0xFFFF)
+#define APPLICATION_PRESENT()   (*(const __flash unsigned int *)0x0000 != 0xFFFF)
 
 // In programming mode the watchdog resets the board when the programmer
 // stays silent for this long (the bootloader would otherwise wait forever

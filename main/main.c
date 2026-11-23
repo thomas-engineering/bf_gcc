@@ -41,7 +41,6 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include <avr/version.h>
@@ -70,6 +69,12 @@
 #include "vcard.h"
 #include "menu.h"
 
+// texts for LCD_puts_f(), stored in flash
+static const __flash char TXT_JUMP_TO_BOOTLOADER[] = "Jump to bootloader";
+static const __flash char TXT_PRESS_ENTER_TO_SLEEP[] = "Press enter to sleep";
+static const __flash char TXT_OFF[] = "Off";
+static const __flash char TXT_ON[] = "On";
+
 #define pLCDREG_test (*(uint8_t *)(0xEC))
 
 uint8_t PowerSaveTimeout = 30;     // Initial value, enable power save mode after 30 min
@@ -97,7 +102,7 @@ int main(void)
 //  uint8_t state, nextstate;
     uint8_t nextstate;
     // mt static char __flash *statetext;
-    PGM_P statetext;
+    const __flash char *statetext;
     uint8_t (*pStateFunc)(uint8_t);
     uint8_t input;
     uint8_t i, j; // char i;
@@ -356,7 +361,6 @@ void Initialization(void)
 *                   Bootloader-section. (the BOOTRST-fuse must be programmed)
 *
 *****************************************************************************/
-// mt - as in jw-patch: const char TEXT_BOOT[] PROGMEM	= "Jump to bootloader";
 
 uint8_t BootFunc(uint8_t input)
 {
@@ -365,7 +369,7 @@ uint8_t BootFunc(uint8_t input)
     if(enter) {
         enter = 0;
         // mt jw LCD_puts_f(TEXT_BOOT, 1);
-        LCD_puts_f(PSTR("Jump to bootloader"), 1);
+        LCD_puts_f(TXT_JUMP_TO_BOOTLOADER, 1);
     }
     else if(input == KEY_ENTER) {
         WDTCR = (1<<WDCE) | (1<<WDE);     //Enable Watchdog Timer to give reset
@@ -395,7 +399,6 @@ uint8_t BootFunc(uint8_t input)
 *   Purpose :       Enable power save
 *
 *****************************************************************************/
-// mt jw const char TEXT_POWER[]  PROGMEM  = "Press enter to sleep";
 
 uint8_t PowerSaveFunc(uint8_t input)
 {
@@ -404,7 +407,7 @@ uint8_t PowerSaveFunc(uint8_t input)
     if(enter) {
         enter = 0;
         //mt jw LCD_puts_f(TEXT_POWER, 1);
-        LCD_puts_f(PSTR("Press enter to sleep"), 1);
+        LCD_puts_f(TXT_PRESS_ENTER_TO_SLEEP, 1);
     }
     else if(input == KEY_ENTER) {
         PowerSave = true;
@@ -465,7 +468,7 @@ uint8_t AutoPower(uint8_t input)
             AutoPowerShowMin();
         }
         else {
-            LCD_puts_f(PSTR("Off"),1);	// mt LCD_puts("Off", 1);        
+            LCD_puts_f(TXT_OFF,1);	// mt LCD_puts("Off", 1);        
         }
     }
     else if(input == KEY_ENTER) {
@@ -493,7 +496,7 @@ uint8_t AutoPower(uint8_t input)
         if(PowerSaveTimeout < 5) {
             AutoPowerSave = false;
             PowerSaveTimeout = 0;
-            LCD_puts_f(PSTR("Off"),1);	// mt LCD_puts("Off", 1);
+            LCD_puts_f(TXT_OFF,1);	// mt LCD_puts("Off", 1);
         }
         else {   
             AutoPowerSave = true;
@@ -543,10 +546,10 @@ uint8_t KeyClick(uint8_t input)
 
 	if ( show ) {
 		if ( gKeyClickStatus ) {
-			LCD_puts_f(PSTR("On"),1);
+			LCD_puts_f(TXT_ON,1);
 		}
 		else {
-			LCD_puts_f(PSTR("Off"),1);
+			LCD_puts_f(TXT_OFF,1);
 		}
 		LCD_UpdateRequired(true, 0);
 	}

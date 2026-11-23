@@ -26,7 +26,6 @@
 
 #include <stdint.h>
 #include <avr/io.h>
-#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 #include "main.h"
@@ -245,7 +244,7 @@
 *
 ******************************************************************************/
 
-const char TEXT_SONG1[] PROGMEM      = "Fur Elise";
+const __flash char TEXT_SONG1[]      = "Fur Elise";
 
 // __flash int FurElise[] =   
 const __flash uint16_t FurElise[] =   
@@ -260,7 +259,7 @@ const __flash uint16_t FurElise[] =
 
 
 //__flash char TEXT_SONG2[]       = "Turkey march";
-const char TEXT_SONG2[] PROGMEM  = "Turkey march";
+const __flash char TEXT_SONG2[]  = "Turkey march";
 
 //__flash int Mozart[] = 
 const __flash uint16_t Mozart[] = 
@@ -276,7 +275,7 @@ const __flash uint16_t Mozart[] =
 
 // mt song 3 & 4 where commented out by ATMEL - see their readme
 // well, the gcc-geek wants all the songs ;-)
-const char TEXT_SONG3[] PROGMEM      = "Minuet";
+const __flash char TEXT_SONG3[]      = "Minuet";
 
 const __flash uint16_t Minuet[] = 
         {
@@ -289,7 +288,7 @@ const __flash uint16_t Minuet[] =
         };
 
 
-const char TEXT_SONG4[] PROGMEM    = "Auld Lang Syne";
+const __flash char TEXT_SONG4[]    = "Auld Lang Syne";
 
 const __flash uint16_t AuldLangSyne[] = 
         {  
@@ -302,7 +301,7 @@ const __flash uint16_t AuldLangSyne[] =
 
 
 //__flash char TEXT_SONG5[]      =   "Sirene1";
-const char TEXT_SONG5[] PROGMEM =   "Sirene1";
+const __flash char TEXT_SONG5[] =   "Sirene1";
 
 //__flash int Sirene1[] = 
 const __flash uint16_t Sirene1[] = 
@@ -321,7 +320,7 @@ const __flash uint16_t Sirene1[] =
         };
 
 //__flash char TEXT_SONG6[]      =   "Sirene2";
-const char TEXT_SONG6[] PROGMEM =   "Sirene2";
+const __flash char TEXT_SONG6[] =   "Sirene2";
 
 //__flash int Sirene2[] = 
 const __flash uint16_t Sirene2[] = 
@@ -333,7 +332,7 @@ const __flash uint16_t Sirene2[] =
 
 
 //__flash char TEXT_SONG7[]      =   "Whistle";
-const char TEXT_SONG7[] PROGMEM      =   "Whistle";
+const __flash char TEXT_SONG7[]      =   "Whistle";
 
 //__flash int Whistle[] = 
 const __flash uint16_t Whistle[] = 
@@ -350,7 +349,7 @@ const __flash uint16_t Whistle[] =
         };
 
 // "Exorzist" added by Martin Thomas (based on demo from the AT90CAN-Library 3.1)
-const char TEXT_SONG8[] PROGMEM   =   "Exorzist";
+const __flash char TEXT_SONG8[]   =   "Exorzist";
 const __flash uint16_t Exorcist[] =
         {
         21,
@@ -365,11 +364,11 @@ const __flash uint16_t Exorcist[] =
 // pointer-array with pointers to the song arrays
 const __flash uint16_t * const __flash Songs[] = { FurElise, Mozart, Minuet, AuldLangSyne, Sirene1, Sirene2, Whistle, Exorcist, 0 };
 
-PGM_P const TEXT_SONG_TBL[] PROGMEM   = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, TEXT_SONG8, 0 };
+const __flash char * const __flash TEXT_SONG_TBL[]   = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, TEXT_SONG8, 0 };
 // const char *TEXT_SONG_TBL[]    = { TEXT_SONG1, TEXT_SONG2, TEXT_SONG3, TEXT_SONG4, TEXT_SONG5, TEXT_SONG6, TEXT_SONG7, 0};
 
 //__flash char PLAYING[]          = "PLAYING";
-const char PLAYING[] PROGMEM   = "PLAYING";
+const __flash char PLAYING[]   = "PLAYING";
 
 // mt: int __flash *pSong;     // pointer to the different songs in flash
 const __flash uint16_t *pSong;	// mt - pointer to the different songs in flash
@@ -420,7 +419,7 @@ void Sound_Init(void)
 // mt inserted local helper to save some flash-space
 static void showSongName(uint8_t songnum)
 {
-    LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[songnum]), 1);  // mt   // Set up the a song in the LCD
+    LCD_puts_f(TEXT_SONG_TBL[songnum], 1);  // mt   // Set up the a song in the LCD
 }
 
 uint8_t SelectSound(uint8_t input)
@@ -442,14 +441,13 @@ uint8_t SelectSound(uint8_t input)
         
     if (input == KEY_PLUS) { // shift to next song
         if(!song) { // wrap around the table
-            for(song=1; pgm_read_word(&TEXT_SONG_TBL[song]); song++){};
+            for(song=1; TEXT_SONG_TBL[song]; song++){};
             song--;
         }    
         else {
             song--;
         }
 
-        // mt LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[song]), 1); // mt
         showSongName(song);
         
         // mt pSong = Songs[song];
@@ -459,11 +457,10 @@ uint8_t SelectSound(uint8_t input)
     else if (input == KEY_MINUS) { // shift to next song
         song++;
 
-        if( !(pgm_read_word(&TEXT_SONG_TBL[song])) ) { // wrap around the table
+        if( !TEXT_SONG_TBL[song] ) { // wrap around the table
             song = 0;
         }
         
-        // mt LCD_puts_f((PGM_P)pgm_read_word(&TEXT_SONG_TBL[song]), 1);
         showSongName(song);
         
         // mt pSong = Songs[song];

@@ -23,7 +23,6 @@
 
 #include <avr/io.h>
 #include <util/atomic.h>
-#include <avr/pgmspace.h>
 #include "button.h"
 
 #include "main.h"

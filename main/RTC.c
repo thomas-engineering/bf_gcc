@@ -27,12 +27,15 @@
 #include <avr/interrupt.h>
 #include "calendar.h"
 #include <util/atomic.h>
-#include <avr/pgmspace.h>
 #include "button.h"
 #include "main.h"
 #include "RTC.h"
 #include "LCD_functions.h"
 #include "BCD.h"
+
+// texts for LCD_puts_f(), stored in flash
+static const __flash char TXT_24H[] = "24H";
+static const __flash char TXT_12H[] = "12H";
 
 volatile uint8_t  gSECOND;
 volatile uint8_t  gMINUTE;
@@ -58,9 +61,9 @@ uint8_t clockformat = CLOCK_24;    // set initial clock format to 24H
 //__flash char EUROPEAN_DATE_TEXT[] =   "DDMMYY";
 //__flash char AMERICAN_DATE_TEXT[] =   "MMDDYY";
 //__flash char CANADIAN_DATE_TEXT[] =   "YYMMDD"; 
-const char EUROPEAN_DATE_TEXT[] PROGMEM =   "DDMMYY";
-const char AMERICAN_DATE_TEXT[] PROGMEM =   "MMDDYY";
-const char CANADIAN_DATE_TEXT[] PROGMEM =   "YYMMDD"; 
+const __flash char EUROPEAN_DATE_TEXT[] =   "DDMMYY";
+const __flash char AMERICAN_DATE_TEXT[] =   "MMDDYY";
+const __flash char CANADIAN_DATE_TEXT[] =   "YYMMDD"; 
 
 // different date formates, table for putting DD, MM and YY at the right place
 // on the LCD
@@ -73,7 +76,7 @@ const __flash uint8_t CANADIAN_DATE_NR[] =   { 0, 1, 2, 3, 4, 5 };
 
 //__flash char __flash *DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
 //__flash char __flash *DATE_FORMAT_NR[] = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
-PGM_P DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
+const __flash char *DATEFORMAT_TEXT[] = {EUROPEAN_DATE_TEXT, AMERICAN_DATE_TEXT, CANADIAN_DATE_TEXT};
 const __flash uint8_t * const __flash DATE_FORMAT_NR[] = {EUROPEAN_DATE_NR, AMERICAN_DATE_NR, CANADIAN_DATE_NR};
 
 
@@ -349,31 +352,31 @@ uint8_t SetClockFormat(uint8_t input)
         enter = 0;
         
         if(clockformat == CLOCK_24) {
-            LCD_puts_f(PSTR("24H"), 1);	 // mt LCD_puts("24H", 1);            
+            LCD_puts_f(TXT_24H, 1);	 // mt LCD_puts("24H", 1);            
         }
         else {
-            LCD_puts_f(PSTR("12H"), 1);	// mt LCD_puts("12H", 1);		
+            LCD_puts_f(TXT_12H, 1);	// mt LCD_puts("12H", 1);		
         }
 
     }
     if (input == KEY_PLUS) {
         if(clockformat == CLOCK_24) {
             clockformat = CLOCK_12;
-            LCD_puts_f(PSTR("12H"), 1); // mt LCD_puts("12H", 1);
+            LCD_puts_f(TXT_12H, 1); // mt LCD_puts("12H", 1);
         }
         else {
             clockformat = CLOCK_24;
-            LCD_puts_f(PSTR("24H"), 1); // mt LCD_puts("24H", 1);            
+            LCD_puts_f(TXT_24H, 1); // mt LCD_puts("24H", 1);            
         }
     }
     else if (input == KEY_MINUS) {
         if(clockformat == CLOCK_12) {
             clockformat = CLOCK_24;
-            LCD_puts_f(PSTR("24H"), 1);	// mt LCD_puts("24H", 1);
+            LCD_puts_f(TXT_24H, 1);	// mt LCD_puts("24H", 1);
         }
         else {
             clockformat = CLOCK_12;
-            LCD_puts_f(PSTR("12H"), 1);   // mt LCD_puts("12H", 1);            
+            LCD_puts_f(TXT_12H, 1);   // mt LCD_puts("12H", 1);            
         }
     }
     else if (input == KEY_ENTER) {

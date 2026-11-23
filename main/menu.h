@@ -16,7 +16,7 @@ typedef struct
 {
     uint8_t state;
     // char __flash *pText;
-    PGM_P pText;
+    const __flash char *pText;
     uint8_t (*pFunc)(uint8_t input);
 } MENU_STATE;
 
@@ -24,31 +24,29 @@ typedef struct
 // Menu text
 // mtA, these where all of the same structure as in the follow. line
 // __flash char MT_AVRBF[]                         = "AVR Butterfly";
-//const char MT_AVRBF[] PROGMEM                     = "AVR Butterfly GCC";
-const char MT_AVRBF[] PROGMEM                     = 
+const __flash char MT_AVRBF[]                     = 
 	{'A','V','R',' ','B','U','T','T','E','R','F','L','Y',' ','G'+0x80,'C'+0x80,'C'+0x80,'\0'};
-const char MT_TIME[] PROGMEM                      = "Time";
-const char MT_TIME_CLOCK[] PROGMEM                = "Clock";
-const char MT_TIME_CLOCK_ADJUST[] PROGMEM         = "Adjust Clock";
-const char MT_TIME_CLOCKFORMAT_ADJUST[] PROGMEM   = "Change Clock Format";
-const char MT_TIME_DATE[] PROGMEM                 = "Date";
-const char MT_TIME_DATE_ADJUST[] PROGMEM          = "Adjust Date";
-const char MT_TIME_DATEFORMAT_ADJUST[] PROGMEM    = "Change Date Format";
-const char MT_MUSIC[] PROGMEM                     = "Music";
-const char MT_VCARD[] PROGMEM                     = "Name";
-const char MT_ENTERNAME[] PROGMEM                 = "Enter name";
-const char MT_TEMPERATURE[] PROGMEM               = "Temperature";
-const char MT_VOLTAGE[] PROGMEM                   = "Voltage";
-const char MT_LIGHT[] PROGMEM                     = "Light";
-const char MT_OPTIONS[] PROGMEM                   = "Options";
-const char MT_OPTIONS_DISPLAY[] PROGMEM           = "Display";
-const char MT_OPTIONS_DISPLAY_CONTRAST[] PROGMEM  = "Adjust contrast";
-// mt - never used: const char MT_OPTIONS_DISPLAY_SEG[] PROGMEM       = "Browse segments";
-const char MT_VCARD_DOWNLOAD_NAME[] PROGMEM       = "Download Name";
-const char MT_OPTIONS_BOOT[] PROGMEM              = "Bootloader";
-const char MT_OPTIONS_POWER_SAVE[] PROGMEM        = "Power Save Mode";
-const char MT_OPTIONS_AUTO_POWER_SAVE[] PROGMEM   = "Auto Power Save";
-const char MT_OPTIONS_KEYCLICK[] PROGMEM          = "Key Click";
+const __flash char MT_TIME[]                      = "Time";
+const __flash char MT_TIME_CLOCK[]                = "Clock";
+const __flash char MT_TIME_CLOCK_ADJUST[]         = "Adjust Clock";
+const __flash char MT_TIME_CLOCKFORMAT_ADJUST[]   = "Change Clock Format";
+const __flash char MT_TIME_DATE[]                 = "Date";
+const __flash char MT_TIME_DATE_ADJUST[]          = "Adjust Date";
+const __flash char MT_TIME_DATEFORMAT_ADJUST[]    = "Change Date Format";
+const __flash char MT_MUSIC[]                     = "Music";
+const __flash char MT_VCARD[]                     = "Name";
+const __flash char MT_ENTERNAME[]                 = "Enter name";
+const __flash char MT_TEMPERATURE[]               = "Temperature";
+const __flash char MT_VOLTAGE[]                   = "Voltage";
+const __flash char MT_LIGHT[]                     = "Light";
+const __flash char MT_OPTIONS[]                   = "Options";
+const __flash char MT_OPTIONS_DISPLAY[]           = "Display";
+const __flash char MT_OPTIONS_DISPLAY_CONTRAST[]  = "Adjust contrast";
+const __flash char MT_VCARD_DOWNLOAD_NAME[]       = "Download Name";
+const __flash char MT_OPTIONS_BOOT[]              = "Bootloader";
+const __flash char MT_OPTIONS_POWER_SAVE[]        = "Power Save Mode";
+const __flash char MT_OPTIONS_AUTO_POWER_SAVE[]   = "Auto Power Save";
+const __flash char MT_OPTIONS_KEYCLICK[]          = "Key Click";
 
 // mt MENU_NEXTSTATE menu_nextstate[] = { 
 const __flash MENU_NEXTSTATE menu_nextstate[] = {

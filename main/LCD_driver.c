@@ -26,7 +26,6 @@
 
 // Include files.
 #include <avr/io.h>
-#include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
 #include "main.h"

@@ -66,14 +66,16 @@ extern volatile uint8_t gScrollMode;
 extern volatile uint8_t gFlashTimer;
 extern bool gColon;
 extern volatile int8_t gScroll;
-// State of the joystick auto-repeat. Packed to one byte so that the access
+// State of the joystick auto-repeat. The state is stored in a uint8_t, not in
+// the enum type itself (whose size is compiler dependent), so that the access
 // from the LCD interrupt and from the main loop stays atomic on the AVR.
-typedef enum __attribute__((packed))
+enum
 {
     JOY_IDLE,       // button state changed, nothing pending
     JOY_PRESSED,    // button held, auto press armed
     JOY_AUTO        // auto press active (repeat counter running)
-} JOYSTICK_AUTO_STATE;
+};
+typedef uint8_t JOYSTICK_AUTO_STATE;
 
 extern volatile JOYSTICK_AUTO_STATE gAutoPressJoystick;
 extern volatile uint8_t gLCD_Start_Scroll_Timer;

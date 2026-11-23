@@ -25,7 +25,6 @@
 //  Include files
 #include <stdint.h>
 #include <avr/io.h>
-#include <avr/pgmspace.h>
 #include "LCD_driver.h"
 #include "LCD_functions.h"
 #include "BCD.h"
@@ -53,7 +52,7 @@ uint8_t CONTRAST = LCD_INITIAL_CONTRAST;
 *****************************************************************************/
 
 // mt void LCD_puts_f(char __flash *pFlashStr, char scrollmode)
-void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode)
+void LCD_puts_f(const __flash char *pFlashStr, uint8_t scrollmode)
 {
     (void)scrollmode;   // not used in this port
     // char i;
@@ -62,10 +61,10 @@ void LCD_puts_f(const char *pFlashStr, uint8_t scrollmode)
     while (gLCD_Update_Required);      // Wait for access to buffer
 
     // mt: for (i = 0; pFlashStr[i] && i < TEXTBUFFER_SIZE; i++)
-    for (i = 0; (const char)(pgm_read_byte(&pFlashStr[i])) && i < TEXTBUFFER_SIZE; i++)
+    for (i = 0; pFlashStr[i] && i < TEXTBUFFER_SIZE; i++)
     {
         // mt: gTextBuffer[i] = pFlashStr[i];
-        gTextBuffer[i] = LCD_CharToCode(pgm_read_byte(&pFlashStr[i]));   // translate once, here
+        gTextBuffer[i] = LCD_CharToCode(pFlashStr[i]);   // translate once, here
     }
 
     gTextBuffer[i] = LCD_CODE_END;
